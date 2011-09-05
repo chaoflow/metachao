@@ -1,0 +1,14 @@
+*,cover
+*.pyc
+/.*.cfg
+/.coverage
+/.mrsd
+/bin
+/coverage
+/develop-eggs
+/devsrc
+/dist
+/eggs
+/eggs-mrsd
+/htmlcov
+/parts
