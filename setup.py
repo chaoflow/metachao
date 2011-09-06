@@ -31,6 +31,7 @@ setup(name='metachao',
       extras_require={
           'test': [
               'interlude',
+              'unittest2',
               'zope.interface',
               ],
           },
