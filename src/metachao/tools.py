@@ -1,3 +1,20 @@
+import functools as ft
+import types
+
+
+class partial(ft.partial):
+    """
+        >>> class A(object):
+        ...     p = partial(lambda x, self, y: x * y, 2)
+        >>> A().p(2)
+        4
+    """
+    def __get__(self, obj, objtype=None):
+        """Simulate func_descr_get() in Objects/funcobject.c
+        """
+        return types.MethodType(self, obj, objtype)
+
+
 def searchnameinbases(name, bases):
     """
         >>> class A(object):

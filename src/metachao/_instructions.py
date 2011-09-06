@@ -1,7 +1,9 @@
+from functools import wraps
 from inspect import getmembers
 from inspect import getmro
 
 from metachao.exceptions import AspectCollision
+from metachao.tools import partial
 
 
 def payload(item):
@@ -148,6 +150,7 @@ class overwrite(EitherOrInstruction):
 
 class plumb(Instruction):
     def apply(self, workbench, stack):
+        # find raw _next function
         try:
             _next = workbench.dct[self.name]
         except KeyError:
@@ -159,12 +162,7 @@ class plumb(Instruction):
                     pass
             else:
                 raise KeyError(self.name)
-        # XXX: use generic curry function
-        plumbfunc = self.payload
-        def plumbwrapper(self, *args, **kw):
-            return plumbfunc(_next, self, *args, **kw)
-        plumbwrapper.__doc__ = plumbfunc.__doc__
-        plumbwrapper.__name__ = plumbfunc.__name__
-        workbench.dct[self.name] = plumbwrapper
-        # XXX: workbench.dct[self.name] = curry(self.payload, _next)
+        # create and set wrapper
+        wrapper = wraps(self.payload)(partial(self.payload, _next))
+        workbench.dct[self.name] = wrapper
         return True
