@@ -1,6 +1,6 @@
 Aspect base class::
 
-    >>> from metachao import Aspect
+    >>> from metachao.aspect import Aspect
 
 Two aspects used on class A::
 
@@ -90,13 +90,18 @@ Collision::
 
 XXX: py.test not nice: __main__.f, instead of just f
 
+Instructions
+------------
+
+::
+    >>> from metachao import aspect
+
 default instruction::
 
-    >>> from metachao import default
     >>> class f(Aspect):
-    ...     a = default(1)
-    ...     b = default(1)
-    ...     c = default(1)
+    ...     a = aspect.default(1)
+    ...     b = aspect.default(1)
+    ...     c = aspect.default(1)
 
     >>> class Base(object):
     ...     b = 2
@@ -114,14 +119,13 @@ default instruction::
 
 overwrite instruction::
 
-    >>> from metachao import overwrite
     >>> class f(Aspect):
-    ...     a = overwrite(1)
-    ...     b = overwrite(1)
-    ...     c = overwrite(1)
+    ...     a = aspect.overwrite(1)
+    ...     b = aspect.overwrite(1)
+    ...     c = aspect.overwrite(1)
 
     >>> class g(Aspect):
-    ...     c = overwrite(2)
+    ...     c = aspect.overwrite(2)
 
     >>> class Base(object):
     ...     b = 3
@@ -140,12 +144,11 @@ overwrite instruction::
 
 finalize instruction::
 
-    >>> from metachao import finalize
     >>> class f(Aspect):
-    ...     a = finalize(1)
+    ...     a = aspect.finalize(1)
 
     >>> class g(Aspect):
-    ...     a = overwrite(2)
+    ...     a = aspect.overwrite(2)
 
     >>> @f
     ... @g
@@ -157,9 +160,8 @@ finalize instruction::
 
 plumb instruction::
 
-    >>> from metachao import plumb
     >>> class f(Aspect):
-    ...     @plumb
+    ...     @aspect.plumb
     ...     def func(_next, self):
     ...         return 2 * _next(self)
 

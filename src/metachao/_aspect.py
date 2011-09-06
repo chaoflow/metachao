@@ -108,8 +108,6 @@ class AspectMeta(type):
         Parse the aspects dictionary and generate instructions from it.
         Undecorated attributes are understood as finalize instructions.
 
-        >>> from metachao import Aspect
-        >>> from metachao import Instruction
         >>> class P(Aspect):
         ...     a = Instruction(1)
         ...     b = 2

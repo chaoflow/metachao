@@ -1,4 +1,4 @@
-from metachao import Aspect
+from metachao.aspect import Aspect
 
 
 def compose(*args, **kw):
