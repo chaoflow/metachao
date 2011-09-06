@@ -157,20 +157,20 @@ finalize instruction::
 
 plumb instruction::
 
-    .. >>> from metachao import plumb
-    .. >>> class f(Aspect):
-    .. ...     @plumb
-    .. ...     def func(_next, self):
-    .. ...         return 2 * _next()
+    >>> from metachao import plumb
+    >>> class f(Aspect):
+    ...     @plumb
+    ...     def func(_next, self):
+    ...         return 2 * _next()
 
-    .. >>> @f
-    .. ... class C(object):
-    .. ...     def func(self):
-    .. ...         return 3
+    >>> @f
+    ... class C(object):
+    ...     def func(self):
+    ...         return 3
 
-    .. >>> c = C()
-    .. >>> c.func()
-    .. 6
+    >>> c = C()
+    >>> c.func()
+    6
 
 
 ``zope.interface`` (if available)
