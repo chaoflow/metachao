@@ -13,9 +13,10 @@ def payload(item):
         >>> payload(Instruction(Instruction(Foo))) is Foo
         True
     """
-    if not isinstance(item, Instruction):
-        return item
-    return payload(item.item)
+    # XXX: check in what case this is needed
+    while isinstance(item, Instruction):
+        item = item.item
+    return item
 
 
 class Instruction(object):
