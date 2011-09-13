@@ -58,7 +58,7 @@ class Instructions(object):
             )
 
 
-class Curry(object):
+class Partial(object):
     def __init__(self, payload, **kw):
         self.payload = payload
         self.default_kw = kw
@@ -81,11 +81,11 @@ class AspectMeta(type):
     """
     def __call__(aspect, origin=None, *args, **kw):
         if origin is None:
-            # only curry the aspect
+            # return partially applied aspect
             if not kw:
-                raise NeedKwToCurry
-            # XXX: support for args currying?
-            return Curry(aspect, **kw)
+                raise NeedKw
+            # XXX: support for partial args application?
+            return Partial(aspect, **kw)
 
         workbench = Workbench(origin, **kw)
         Instructions(aspect)(workbench)
