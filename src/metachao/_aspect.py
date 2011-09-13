@@ -34,6 +34,7 @@ class Instructions(object):
 
     def __call__(self, workbench):
         if type(workbench.origin) is AspectMeta:
+            # XXX: it is an error if there is no __metachao_instructions__ yet
             workbench.dct.setdefault(self.attrname, []).extend(self)
         else:
             for instr in self.instructions:
