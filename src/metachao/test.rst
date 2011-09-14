@@ -163,7 +163,7 @@ plumb instruction::
     >>> class f(Aspect):
     ...     @aspect.plumb
     ...     def func(_next, self):
-    ...         return 2 * _next(self)
+    ...         return 2 * _next()
 
     >>> @f
     ... class C(object):

@@ -153,6 +153,7 @@ class plumb(Instruction):
     def apply(self, workbench, stack):
         # find raw _next function
         try:
+            # XXX: for objects, dct could contain all members retrieved via getattr
             _next = workbench.dct[self.name]
         except KeyError:
             for base in getmro(workbench.origin)[1:]:
@@ -164,6 +165,10 @@ class plumb(Instruction):
             else:
                 raise KeyError(self.name)
         # create and set wrapper
-        wrapper = wraps(self.payload)(partial(self.payload, _next))
+        payload = self.payload
+        @wraps(payload)
+        def wrapper(self, *args, **kw):
+            boundnext = _next.__get__(self, self.__class__)
+            return payload(boundnext, self, *args, **kw)
         workbench.dct[self.name] = wrapper
         return True
