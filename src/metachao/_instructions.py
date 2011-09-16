@@ -1,6 +1,7 @@
 from functools import wraps
 from inspect import getmembers
 from inspect import getmro
+from inspect import isclass
 
 from metachao.exceptions import AspectCollision
 from metachao.tools import partial
@@ -166,9 +167,14 @@ class plumb(Instruction):
                 raise KeyError(self.name)
         # create and set wrapper
         payload = self.payload
-        @wraps(payload)
-        def wrapper(self, *args, **kw):
-            boundnext = _next.__get__(self, self.__class__)
-            return payload(boundnext, self, *args, **kw)
+        if isclass(workbench.origin):
+            @wraps(payload)
+            def wrapper(self, *args, **kw):
+                boundnext = _next.__get__(self, self.__class__)
+                return payload(boundnext, self, *args, **kw)
+        else:
+            @wraps(payload)
+            def wrapper(self, *args, **kw):
+                return payload(_next, self, *args, **kw)
         workbench.dct[self.name] = wrapper
         return True

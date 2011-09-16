@@ -224,3 +224,34 @@ The interfaces implemented by the aspect and its base are also implemented::
     True
     >>> ISomeBase.implementedBy(Class)
     True
+
+
+Aspects on objects
+~~~~~~~~~~~~~~~~~~
+
+    >>> class emptyaspect(Aspect):
+    ...     pass
+    >>> d = dict(a=1, b=2)
+    >>> ead = emptyaspect(d)
+
+    >>> isinstance(ead, dict)
+    True
+
+    >>> sorted([x for x in ead])
+    ['a', 'b']
+
+    >>> ead['c'] = 3
+    >>> d['c']
+    3
+
+    >>> class prefix(Aspect):
+    ...     @aspect.plumb
+    ...     def __iter__(_next, self):
+    ...         return ('pre-' + x for x in _next())
+
+    >>> pred = prefix(d)
+    >>> sorted([x for x in pred])
+    ['pre-a', 'pre-b', 'pre-c']
+
+    >>> isinstance(pred, dict)
+    True

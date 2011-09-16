@@ -1,3 +1,5 @@
+from inspect import getmembers
+from inspect import isclass
 from itertools import chain
 
 try:
@@ -13,7 +15,7 @@ from metachao.exceptions import AspectCollision
 from metachao.tools import Bases
 
 
-# XXX: derive from list/UserList and store self on aspect
+# XXX: derive from list/UserList and store self on aspect?
 class Instructions(object):
     """Adapter to store instructions on a aspect
 
@@ -34,8 +36,8 @@ class Instructions(object):
 
     def __call__(self, workbench):
         if type(workbench.origin) is AspectMeta:
-            # XXX: it is an error if there is no __metachao_instructions__ yet
-            workbench.dct.setdefault(self.attrname, []).extend(self)
+            curinstr = workbench.dct[self.attrname]
+            workbench.dct[self.attrname] = curinstr + self.instructions
         else:
             for instr in self.instructions:
                 instr(workbench)
@@ -72,19 +74,39 @@ class Workbench(object):
     def __init__(self, origin, **kw):
         self.origin = origin
         self.kw = kw
-        self.dct = origin.__dict__.copy()
-        self.bases = Bases(origin)
+        self.dct = dict(__metachao_origin__=origin)
+        if isclass(origin):
+            self.name = origin.__name__
+            self.dct.update(origin.__dict__)
+            # XXX: fix naming (also see self.baseclasses)
+            self.bases = Bases(origin)
+            self.baseclasses = origin.__bases__
+            self.type = type(origin)
+        else:
+            self.name = "MetachaoAdapter"
+            self.baseclasses = (origin.__class__,)
+            self.type = type
+            blacklist = (
+                '__setattr__', '__reduce_ex__', '__new__', '__reduce__',
+                '__str__', '__format__', '__getattribute__', '__class__',
+                '__delattr__', '__subclasshook__', '__repr__', '__hash__',
+                '__sizeof__', '__doc__', '__init__'
+                )
+            for k,v in filter(lambda x: x[0] not in blacklist,
+                              getmembers(origin)):
+                self.dct[k] = v
 
 
 class AspectMeta(type):
     """meta class for aspects
     """
     def __call__(aspect, origin=None, *args, **kw):
+        # if called without positional arg, return partially applied
+        # aspect
         if origin is None:
-            # return partially applied aspect
             if not kw:
                 raise NeedKw
-            # XXX: support for partial args application?
+            # XXX: support for partial args?
             return Partial(aspect, **kw)
 
         workbench = Workbench(origin, **kw)
@@ -98,10 +120,14 @@ class AspectMeta(type):
 
         # build a new class, with the same name and bases as the
         # target class, but a new dictionary with the aspect applied.
-        cls = type(origin)(origin.__name__, origin.__bases__, workbench.dct)
+        cls = workbench.type(workbench.name, workbench.baseclasses,
+                             workbench.dct)
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
-        return cls
+        if isclass(origin):
+            return cls
+        return cls()
+
 
     def __init__(aspect, name, bases, dct):
         """Will be called when a aspect class is created
