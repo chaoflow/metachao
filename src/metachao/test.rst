@@ -87,6 +87,8 @@ Collision::
     Traceback (most recent call last):
       ...
     AspectCollision: a
+      2
+      with: <class 'f'>
 
 XXX: py.test not nice: __main__.f, instead of just f
 
