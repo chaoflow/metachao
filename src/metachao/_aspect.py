@@ -70,6 +70,15 @@ class Partial(object):
                                                 kw.iteritems())))
 
 
+def boundproperty(instance, name):
+    """Return a property with fdel/fget/fset bound to instance
+    """
+    return property(
+        lambda self: getattr(instance, name),
+        lambda self, value: setattr(instance, name, value),
+        lambda self: delattr(instance, name),
+        )
+
 class Workbench(object):
     def __init__(self, origin, **kw):
         self.origin = origin
@@ -93,8 +102,15 @@ class Workbench(object):
                 '__sizeof__', '__doc__', '__init__'
                 )
             for k,v in filter(lambda x: x[0] not in blacklist,
-                              getmembers(origin)):
-                self.dct[k] = v
+                              getmembers(origin.__class__)):
+                if type(v) is property:
+                    # XXX: could also be handled by a generic __get/set/delattr__ combo
+                    attr = boundproperty(origin, k)
+                elif callable(v):
+                    attr = getattr(origin, k)
+                else:
+                    continue
+                self.dct[k] = attr
 
 
 class AspectMeta(type):

@@ -257,3 +257,28 @@ Aspects on objects
 
     >>> isinstance(pred, dict)
     True
+
+Handle properties::
+
+    >>> class Base(object):
+    ...     def geta(self):
+    ...         return self._a
+    ...     def seta(self, value):
+    ...         self._a = value
+    ...     def dela(self):
+    ...         del self._a
+    ...     a = property(geta, seta, dela)
+
+    >>> b = Base()
+    >>> b.a = 1
+    >>> c = Aspect(b)
+    >>> c.a
+    1
+    >>> c.a = 2
+    >>> b.a
+    2
+    >>> del c.a
+    >>> b.a
+    Traceback (most recent call last):
+      ...
+    AttributeError: 'Base' object has no attribute '_a'
