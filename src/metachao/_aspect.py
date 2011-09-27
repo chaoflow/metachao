@@ -92,25 +92,33 @@ class Workbench(object):
             self.baseclasses = origin.__bases__
             self.type = type(origin)
         else:
-            self.name = "MetachaoAdapter"
+            self.name = "DynamicAdapter"
             self.baseclasses = (origin.__class__,)
             self.type = type
             blacklist = (
                 '__setattr__', '__reduce_ex__', '__new__', '__reduce__',
                 '__str__', '__format__', '__getattribute__', '__class__',
                 '__delattr__', '__subclasshook__', '__repr__', '__hash__',
-                '__sizeof__', '__doc__', '__init__'
+                '__sizeof__', '__doc__', '__init__', '__getattr__'
                 )
-            for k,v in filter(lambda x: x[0] not in blacklist,
-                              getmembers(origin.__class__)):
-                if type(v) is property:
-                    # XXX: could also be handled by a generic __get/set/delattr__ combo
-                    attr = boundproperty(origin, k)
-                elif callable(v):
-                    attr = getattr(origin, k)
-                else:
-                    continue
-                self.dct[k] = attr
+            # for k,v in filter(lambda x: x[0] not in blacklist,
+            #                   getmembers(origin.__class__)):
+            #     if type(v) is property:
+            #         # XXX: could also be handled by a generic __get/set/delattr__ combo
+            #         attr = boundproperty(origin, k)
+            #     elif callable(v):
+            #         attr = getattr(origin, k)
+            #     else:
+            #         continue
+            #     self.dct[k] = attr
+
+            # handle callables
+            for k,v in filter(lambda x: x[0] not in blacklist and callable(x[1]),
+                              getmembers(origin)):
+                self.dct[k] = getattr(origin, k)
+            # generic getattr and failing setattr
+            self.dct['__getattr__'] = lambda _, name: getattr(origin, name)
+            self.dct['__setattr__'] = lambda _, name, v: WhatDoYouExpectToHappen
 
 
 class AspectMeta(type):

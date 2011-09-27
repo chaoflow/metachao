@@ -274,11 +274,14 @@ Handle properties::
     >>> c = Aspect(b)
     >>> c.a
     1
-    >>> c.a = 2
-    >>> b.a
-    2
-    >>> del c.a
-    >>> b.a
-    Traceback (most recent call last):
-      ...
-    AttributeError: 'Base' object has no attribute '_a'
+
+XXX: Do we want these::
+
+    .. >>> c.a = 2
+    .. >>> b.a
+    .. 2
+    .. >>> del c.a
+    .. >>> b.a
+    .. Traceback (most recent call last):
+    ..   ...
+    .. AttributeError: 'Base' object has no attribute '_a'
