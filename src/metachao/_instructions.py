@@ -155,9 +155,10 @@ class plumb(Instruction):
     def apply(self, workbench, stack):
         # find raw _next function
         try:
-            # XXX: for objects, dct could contain all members retrieved via getattr
             _next = workbench.dct[self.name]
         except KeyError:
+            if not isclass(workbench.origin):
+                raise
             for base in getmro(workbench.origin)[1:]:
                 try:
                     _next = base.__dict__[self.name]
