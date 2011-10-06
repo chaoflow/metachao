@@ -71,7 +71,7 @@ class Partial(object):
 
 
 def boundproperty(instance, name):
-    """Return a property with fdel/fget/fset bound to instance
+    """Return a property with fget/fset/fdel bound to instance
     """
     return property(
         lambda self: getattr(instance, name),
@@ -93,9 +93,13 @@ class Workbench(object):
             self.baseclasses = origin.__bases__
             self.type = type(origin)
         else:
+            # we are pretty much creating an object that uses origin
+            # as prototype.
             self.name = "DynamicAdapter"
             self.baseclasses = (origin.__class__,)
             self.type = type
+
+            # bound methods found on origin, except if blacklisted
             blacklist = (
                 '__class__', '__delattr__', '__doc__', '__format__',
                 '__getattr__', '__getattribute__', '__hash__',
@@ -103,24 +107,15 @@ class Workbench(object):
                 '__repr__', '__setattr__', '__sizeof__', '__str__',
                 '__subclasshook__',
                 )
-            # for k,v in filter(lambda x: x[0] not in blacklist,
-            #                   getmembers(origin.__class__)):
-            #     if type(v) is property:
-            #         # XXX: could also be handled by a generic __get/set/delattr__ combo
-            #         attr = boundproperty(origin, k)
-            #     elif callable(v):
-            #         attr = getattr(origin, k)
-            #     else:
-            #         continue
-            #     self.dct[k] = attr
+            self.dct.update(((k, getattr(origin, k))
+                             for k, v in getmembers(origin)
+                             if callable(v) and not k in blacklist))
 
-            # handle callables
-            for k,v in filter(lambda x: x[0] not in blacklist and callable(x[1]),
-                              getmembers(origin)):
-                self.dct[k] = getattr(origin, k)
-            # generic getattr and failing setattr
+            # getattr fallback to origin, setattr and delattr on new
             self.dct['__getattr__'] = lambda _, name: getattr(origin, name)
-            self.dct['__setattr__'] = lambda _, name, v: WhatDoYouExpectToHappen
+
+            # empty __init__ needed if a later aspects plumbs it
+            self.dct['__init__'] = lambda *a, **kw : None
 
 
 class AspectMeta(type):
