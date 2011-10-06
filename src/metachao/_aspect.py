@@ -70,13 +70,17 @@ class Workbench(object):
         self.dct = dict()
         if isclass(origin):
             self.name = origin.__name__
+            blacklist = DICT_KEYS_OF_PLAIN_CLASS + [
+                '__metachao_origin__',
+                ]
             self.dct.update(((k, v)
                              for k, v in origin.__dict__.iteritems()
-                             if k not in DICT_KEYS_OF_PLAIN_CLASS))
+                             if k not in blacklist))
             # XXX: fix naming (also see self.baseclasses)
             self.bases = Bases(origin)
             self.baseclasses = origin.__bases__
             self.type = type(origin)
+            self.dct['__metachao_origin__'] = origin
         else:
             # we are pretty much creating an object that uses origin
             # as prototype.
@@ -88,9 +92,10 @@ class Workbench(object):
             blacklist = (
                 '__class__', '__delattr__', '__doc__', '__format__',
                 '__getattr__', '__getattribute__', '__hash__',
-                '__init__', '__new__', '__reduce__', '__reduce_ex__',
-                '__repr__', '__setattr__', '__sizeof__', '__str__',
-                '__subclasshook__',
+                '__init__', '__metachao_origin__',
+                '__metachao_prototype__', '__new__', '__reduce__',
+                '__reduce_ex__', '__repr__', '__setattr__',
+                '__sizeof__', '__str__', '__subclasshook__',
                 )
             self.dct.update(((k, getattr(origin, k))
                              for k, v in getmembers(origin)
@@ -107,7 +112,7 @@ class Workbench(object):
 
             # empty __init__ needed if a later aspects plumbs it
             self.dct['__init__'] = lambda *a, **kw : None
-        self.dct['__metachao_origin__'] = origin
+            self.dct['__metachao_prototype__'] = origin
 
 
 class AspectMeta(type):
