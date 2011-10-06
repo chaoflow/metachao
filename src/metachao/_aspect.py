@@ -12,6 +12,7 @@ except ImportError:                   # pragma NO COVERAGE
 from metachao._instructions import Instruction
 from metachao._instructions import finalize
 from metachao.exceptions import AspectCollision
+from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
 
 
@@ -93,10 +94,7 @@ class Workbench(object):
 
             # properties bound to origin for all properties found on
             # origin's class
-            #
-            # XXX: a properties getter and setter should not be bound
-            # and the getter should only fallback to origin
-            self.dct.update(((k, boundproperty(origin, k))
+            self.dct.update(((k, prototype_property(origin, v))
                              for k, v in getmembers(origin.__class__)
                              if type(v) is property))
 

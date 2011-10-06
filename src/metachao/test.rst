@@ -258,7 +258,8 @@ Aspects on objects
     >>> isinstance(pred, dict)
     True
 
-Handle properties::
+Handle properties, changes only take effect on the new object, the
+other is used as prototype::
 
     >>> class Base(object):
     ...     def geta(self):
@@ -276,13 +277,25 @@ Handle properties::
     1
 
     >>> c.a = 2
-    >>> b.a
+    >>> c.a
     2
-    >>> del c.a
     >>> b.a
+    1
+    >>> del c.a
+    >>> c.a
+    1
+    >>> del c.a
     Traceback (most recent call last):
       ...
-    AttributeError: 'Base' object has no attribute '_a'
+    AttributeError: _a
+
+XXX: not sure whether this is really what we want. Does applying an
+empty aspect mean, that we get an object using the one passed to
+aspect as prototype for attribute access? I think yes, because
+e.g. for a prefix aspect that adds a prefix to dictionary keys, we
+need a place to store the prefix: the instance.
+
+Applying property twice works two, but is not really needed::
 
     >>> class Base(object):
     ...     pass
