@@ -1,6 +1,5 @@
 from inspect import getmembers
 from inspect import isclass
-from itertools import chain
 
 try:
     from zope.interface import classImplements

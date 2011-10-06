@@ -1,6 +1,8 @@
 import functools as ft
 import types
 
+from itertools import chain
+
 
 def boundproperty(instance, name):
     """Return a property with fget/fset/fdel bound to instance
