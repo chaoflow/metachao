@@ -111,6 +111,15 @@ class Workbench(object):
                              for k, v in getmembers(origin)
                              if callable(v) and not k in blacklist))
 
+            # properties bound to origin for all properties found on
+            # origin's class
+            #
+            # XXX: a properties getter and setter should not be bound
+            # and the getter should only fallback to origin
+            self.dct.update(((k, boundproperty(origin, k))
+                             for k, v in getmembers(origin.__class__)
+                             if type(v) is property))
+
             # getattr fallback to origin, setattr and delattr on new
             self.dct['__getattr__'] = lambda _, name: getattr(origin, name)
 

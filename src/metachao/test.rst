@@ -275,13 +275,44 @@ Handle properties::
     >>> c.a
     1
 
-XXX: Do we want these::
+    >>> c.a = 2
+    >>> b.a
+    2
+    >>> del c.a
+    >>> b.a
+    Traceback (most recent call last):
+      ...
+    AttributeError: 'Base' object has no attribute '_a'
 
-    .. >>> c.a = 2
-    .. >>> b.a
-    .. 2
-    .. >>> del c.a
-    .. >>> b.a
-    .. Traceback (most recent call last):
-    ..   ...
-    .. AttributeError: 'Base' object has no attribute '_a'
+    >>> class Base(object):
+    ...     pass
+
+    >>> class prop(Aspect):
+    ...     def geta(self):
+    ...         return self._a
+    ...     def seta(self, value):
+    ...         self._a = value
+    ...     a = property(geta, seta)
+
+    >>> b = Base()
+    >>> p = prop(b)
+    >>> p.a = 1
+    >>> p.a
+    1
+    >>> '_a' in dir(b)
+    False
+    >>> '_a' in dir(p)
+    True
+
+    >>> pp = prop(p)
+    >>> pp.a
+    1
+    >>> '_a' in dir(pp)
+    False
+    >>> pp._a
+    1
+    >>> pp.a = 2
+    >>> pp.a
+    2
+    >>> p.a
+    1
