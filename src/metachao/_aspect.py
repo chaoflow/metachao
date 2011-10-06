@@ -79,6 +79,7 @@ def boundproperty(instance, name):
         lambda self: delattr(instance, name),
         )
 
+
 class Workbench(object):
     def __init__(self, origin, **kw):
         self.origin = origin
@@ -96,10 +97,11 @@ class Workbench(object):
             self.baseclasses = (origin.__class__,)
             self.type = type
             blacklist = (
-                '__setattr__', '__reduce_ex__', '__new__', '__reduce__',
-                '__str__', '__format__', '__getattribute__', '__class__',
-                '__delattr__', '__subclasshook__', '__repr__', '__hash__',
-                '__sizeof__', '__doc__', '__init__', '__getattr__'
+                '__class__', '__delattr__', '__doc__', '__format__',
+                '__getattr__', '__getattribute__', '__hash__',
+                '__init__', '__new__', '__reduce__', '__reduce_ex__',
+                '__repr__', '__setattr__', '__sizeof__', '__str__',
+                '__subclasshook__',
                 )
             # for k,v in filter(lambda x: x[0] not in blacklist,
             #                   getmembers(origin.__class__)):
