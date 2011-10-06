@@ -67,7 +67,7 @@ class Workbench(object):
     def __init__(self, origin, **kw):
         self.origin = origin
         self.kw = kw
-        self.dct = dict(__metachao_origin__=origin)
+        self.dct = dict()
         if isclass(origin):
             self.name = origin.__name__
             self.dct.update(((k, v)
@@ -107,6 +107,7 @@ class Workbench(object):
 
             # empty __init__ needed if a later aspects plumbs it
             self.dct['__init__'] = lambda *a, **kw : None
+        self.dct['__metachao_origin__'] = origin
 
 
 class AspectMeta(type):
