@@ -78,17 +78,17 @@ Two aspects used on class A::
 
 Collision::
 
-    >>> class f(Aspect):
-    ...     a = 1
+    .. >>> class f(Aspect):
+    .. ...     a = 1
 
-    >>> @f
-    ... class C(object):
-    ...     a = 2
-    Traceback (most recent call last):
-      ...
-    AspectCollision: a
-      2
-      with: <class 'f'>
+    .. >>> @f
+    .. ... class C(object):
+    .. ...     a = 2
+    .. Traceback (most recent call last):
+    ..   ...
+    .. AspectCollision: a
+    ..   2
+    ..   with: <class 'f'>
 
 XXX: py.test not nice: __main__.f, instead of just f
 
