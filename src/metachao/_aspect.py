@@ -15,6 +15,9 @@ from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
 
 
+DICT_KEYS_OF_PLAIN_CLASS = ['__dict__', '__doc__', '__module__', '__weakref__']
+
+
 # XXX: derive from list/UserList and store self on aspect?
 class Instructions(object):
     """Adapter to store instructions on a aspect
@@ -67,7 +70,9 @@ class Workbench(object):
         self.dct = dict(__metachao_origin__=origin)
         if isclass(origin):
             self.name = origin.__name__
-            self.dct.update(origin.__dict__)
+            self.dct.update(((k, v)
+                             for k, v in origin.__dict__.iteritems()
+                             if k not in DICT_KEYS_OF_PLAIN_CLASS))
             # XXX: fix naming (also see self.baseclasses)
             self.bases = Bases(origin)
             self.baseclasses = origin.__bases__
@@ -157,7 +162,7 @@ class AspectMeta(type):
             # ignored attributes
             if name.startswith('__metachao_'):
                 continue
-            if name in ['__doc__', '__module__']:
+            if name in DICT_KEYS_OF_PLAIN_CLASS:
                 continue
 
             # XXX: rethink this

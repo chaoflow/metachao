@@ -329,3 +329,27 @@ Applying property twice works two, but is not really needed::
     2
     >>> p.a
     1
+
+
+__dict__ keys of a plain class are as expected::
+
+    >>> class Plain(object):
+    ...     pass
+    >>> sorted(Plain.__dict__.keys())
+    ['__dict__', '__doc__', '__module__', '__weakref__']
+    >>> from metachao._aspect import DICT_KEYS_OF_PLAIN_CLASS
+    >>> DICT_KEYS_OF_PLAIN_CLASS == sorted(Plain.__dict__.keys())
+    True
+
+Edge case::
+
+    >>> class aspect1(Aspect):
+    ...     a = 1
+    >>> class aspect2(Aspect):
+    ...     b = 2
+    >>> @aspect1
+    ... class Foo(object):
+    ...     c = 3
+
+    >>> foo = aspect2(Foo())
+    >>> foo = aspect2(Foo)()
