@@ -2,6 +2,27 @@ import functools as ft
 import types
 
 
+def boundproperty(instance, name):
+    """Return a property with fget/fset/fdel bound to instance
+    """
+    return property(
+        lambda self: getattr(instance, name),
+        lambda self, value: setattr(instance, name, value),
+        lambda self: delattr(instance, name),
+        )
+
+
+# XXX: do we need this or is lowercase partial sufficient?
+class Partial(object):
+    def __init__(self, payload, **kw):
+        self.payload = payload
+        self.default_kw = kw
+
+    def __call__(self, *args, **kw):
+        return self.payload(*args, **dict(chain(self.default_kw.iteritems(),
+                                                kw.iteritems())))
+
+
 class partial(ft.partial):
     """
         >>> class A(object):

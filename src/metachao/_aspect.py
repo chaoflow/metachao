@@ -12,7 +12,7 @@ except ImportError:                   # pragma NO COVERAGE
 from metachao._instructions import Instruction
 from metachao._instructions import finalize
 from metachao.exceptions import AspectCollision
-from metachao.tools import Bases
+from metachao.tools import Bases, Partial, boundproperty
 
 
 # XXX: derive from list/UserList and store self on aspect?
@@ -58,26 +58,6 @@ class Instructions(object):
         return repr(
             [(x.name, x.__class__, x.payload) for x in self.instructions]
             )
-
-
-class Partial(object):
-    def __init__(self, payload, **kw):
-        self.payload = payload
-        self.default_kw = kw
-
-    def __call__(self, *args, **kw):
-        return self.payload(*args, **dict(chain(self.default_kw.iteritems(),
-                                                kw.iteritems())))
-
-
-def boundproperty(instance, name):
-    """Return a property with fget/fset/fdel bound to instance
-    """
-    return property(
-        lambda self: getattr(instance, name),
-        lambda self, value: setattr(instance, name, value),
-        lambda self: delattr(instance, name),
-        )
 
 
 class Workbench(object):
@@ -157,7 +137,6 @@ class AspectMeta(type):
         if isclass(origin):
             return cls
         return cls()
-
 
     def __init__(aspect, name, bases, dct):
         """Will be called when a aspect class is created
