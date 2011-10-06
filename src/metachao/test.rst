@@ -236,9 +236,6 @@ Aspects on objects
     >>> d = dict(a=1, b=2)
     >>> ead = emptyaspect(d)
 
-    >>> isinstance(ead, dict)
-    True
-
     >>> sorted([x for x in ead])
     ['a', 'b']
 
@@ -255,8 +252,6 @@ Aspects on objects
     >>> sorted([x for x in pred])
     ['pre-a', 'pre-b', 'pre-c']
 
-    >>> isinstance(pred, dict)
-    True
 
 Handle properties, changes only take effect on the new object, the
 other is used as prototype::

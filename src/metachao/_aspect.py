@@ -80,8 +80,8 @@ class Workbench(object):
         else:
             # we are pretty much creating an object that uses origin
             # as prototype.
-            self.name = "DynamicAdapter"
-            self.baseclasses = (origin.__class__,)
+            self.name = "Prototyper"
+            self.baseclasses = ()
             self.type = type
 
             # bound methods found on origin, except if blacklisted
