@@ -149,6 +149,8 @@ class AspectMeta(type):
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
         if isclass(origin):
+            if type(cls) is AspectMeta and kw:
+                return Partial(cls, **kw)
             return cls
         return cls()
 
