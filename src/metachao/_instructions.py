@@ -116,8 +116,6 @@ class finalize(EitherOrInstruction):
         if self.name not in workbench.dct:
             return True
         if not stack or isinstance(stack[-1], finalize):
-            # XXX: temporarily ignore collisions
-            return True
             raise AspectCollision("%s\n  %s\n  with: %s" % (
                 self.name, workbench.dct[self.name], self.__parent__))
         return True

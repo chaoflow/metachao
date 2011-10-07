@@ -8,7 +8,7 @@ except ImportError:                   # pragma NO COVERAGE
     ZOPE_INTERFACE_AVAILABLE = False  # pragma NO COVERAGE
 
 from metachao._instructions import Instruction
-from metachao._instructions import finalize
+from metachao._instructions import overwrite
 from metachao.exceptions import AspectCollision
 from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
@@ -187,9 +187,9 @@ class AspectMeta(type):
                     continue
 
                 # XXX: rethink this
-                # undecorated items are understood as finalize
+                # undecorated items are understood as overwrite
                 if not isinstance(item, Instruction):
-                    item = finalize(item)
+                    item = overwrite(item)
                 item.__name__ = name
                 item.__parent__ = aspect
                 instructions.append(item)
