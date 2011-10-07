@@ -348,3 +348,72 @@ Edge case::
 
     >>> foo = aspect2(Foo())
     >>> foo = aspect2(Foo)()
+
+
+Combining aspects
+-----------------
+
+one aspect and a class to apply it to start with::
+
+    >>> class a1(Aspect):
+    ...     a = 1
+    ...     
+    ...     @aspect.plumb
+    ...     def f(_next, self):
+    ...         return 2 * _next()
+
+    >>> class A(object):
+    ...     def f(self):
+    ...         return 1
+
+    >>> a1(A)().a
+    1
+    >>> a1(A)().f()
+    2
+
+inheritance::
+
+    >>> class a2(a1):
+    ...     @aspect.plumb
+    ...     def f(_next, self):
+    ...         return 10 + _next()
+
+    >>> a2(A)().a
+    1
+    >>> a2(A)().f()
+    11
+    >>> a2(A()).f()
+    11
+
+double::
+
+    >>> a1(a1)(A)().a
+    1
+    >>> a1(a1(A))().f()
+    4
+    >>> a1(a1)(A)().f()
+    4
+    >>> a1(a1(A)()).f()
+    4
+    >>> a1(a1(A())).f()
+    4
+
+#    >>> a1(a1)(A()).f()
+#    4
+
+
+double and inheritance::
+
+    >>> a1(a2)(A)().a
+    1
+    >>> a1(a2(A))().f()
+    22
+    >>> a1(a2)(A)().f()
+    22
+    >>> a1(a2(A)()).f()
+    22
+    >>> a1(a2(A())).f()
+    22
+
+#    >>> a1(a2)(A()).f()
+#    22

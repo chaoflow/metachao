@@ -1,5 +1,4 @@
-from inspect import getmembers
-from inspect import isclass
+from inspect import getmembers, getmro, isclass
 
 try:
     from zope.interface import classImplements
@@ -44,6 +43,13 @@ class Instructions(object):
         else:
             for instr in self.instructions:
                 instr(workbench)
+
+    def __contains__(self, name):
+        for x in self:
+            if x.name == name:
+                return True
+        else:
+            return False
 
     def __getattr__(self, name):
         return getattr(self.instructions, name)
@@ -164,20 +170,26 @@ class AspectMeta(type):
         # Get the aspect's instructions list
         instructions = Instructions(aspect)
 
-        for name, item in aspect.__dict__.iteritems():
-            # ignored attributes
-            if name.startswith('__metachao_'):
-                continue
-            if name in DICT_KEYS_OF_PLAIN_CLASS:
-                continue
+        # walk the mro, w/o object, gathering/creating instructions
+        for cls in getmro(aspect)[:-1]:
+            for name, item in cls.__dict__.iteritems():
+                # ignored attributes
+                if name.startswith('__metachao_'):
+                    continue
+                if name in ('__implemented__', '__metaclass__', '__provides__'):
+                    continue
+                if name in DICT_KEYS_OF_PLAIN_CLASS:
+                    continue
+                if name in instructions:
+                    continue
 
-            # XXX: rethink this
-            # undecorated items are understood as finalize
-            if not isinstance(item, Instruction):
-                item = finalize(item)
-            item.__name__ = name
-            item.__parent__ = aspect
-            instructions.append(item)
+                # XXX: rethink this
+                # undecorated items are understood as finalize
+                if not isinstance(item, Instruction):
+                    item = finalize(item)
+                item.__name__ = name
+                item.__parent__ = aspect
+                instructions.append(item)
 
         # # An existing docstring is an implicit plumb instruction for __doc__
         # if aspect.__doc__ is not None:
