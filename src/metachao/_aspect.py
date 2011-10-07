@@ -130,7 +130,6 @@ class AspectMeta(type):
         if origin is None:
             if not kw:
                 raise NeedKw
-            # XXX: support for partial args?
             return Partial(aspect, **kw)
 
         workbench = Workbench(origin, **kw)
