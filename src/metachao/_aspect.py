@@ -176,8 +176,10 @@ class AspectMeta(type):
                 # ignored attributes
                 if name.startswith('__metachao_'):
                     continue
-                if name in ('__implemented__', '__metaclass__', '__provides__'):
-                    continue
+                if name in (
+                    '__implemented__', '__metaclass__',
+                    '__provides__', '__providedBy__',
+                    ): continue
                 if name in DICT_KEYS_OF_PLAIN_CLASS:
                     continue
                 if name in instructions:
