@@ -164,7 +164,7 @@ class AspectMeta(type):
         ...     b = 2
         >>> Instructions(P)
         [('a', <class 'metachao._instructions.Instruction'>, 1),
-         ('b', <class 'metachao._instructions.finalize'>, 2)]
+         ('b', <class 'metachao._instructions.overwrite'>, 2)]
         """
         super(AspectMeta, aspect).__init__(name, bases, dct)
 
