@@ -2,7 +2,7 @@ from functools import wraps
 from inspect import getmembers
 from inspect import getmro
 from inspect import isclass
-from types import FunctionType
+from types import MethodType
 
 from metachao.exceptions import AspectCollision
 from metachao.tools import partial
@@ -172,7 +172,8 @@ class plumb(Instruction):
                 raise KeyError(self.name)
         # create and set wrapper
         payload = self.payload
-        if type(_next) is FunctionType:
+        # XXX: type(dict().__iter__) because I don't know where to find it
+        if type(_next) not in (MethodType, type(dict().__iter__)):
             @wraps(payload)
             def wrapper(self, *args, **kw):
                 boundnext = _next.__get__(self, self.__class__)
