@@ -397,9 +397,8 @@ double::
     4
     >>> a1(a1(A())).f()
     4
-
-#    >>> a1(a1)(A()).f()
-#    4
+    >>> a1(a1)(A()).f()
+    4
 
 
 double and inheritance::
@@ -414,6 +413,5 @@ double and inheritance::
     22
     >>> a1(a2(A())).f()
     22
-
-#    >>> a1(a2)(A()).f()
-#    22
+    >>> a1(a2)(A()).f()
+    22
