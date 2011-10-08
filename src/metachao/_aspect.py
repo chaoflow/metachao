@@ -125,6 +125,9 @@ class AspectMeta(type):
     """meta class for aspects
     """
     def __call__(aspect, origin=None, *args, **kw):
+        if kw.get('pdb'):
+            import pdb;pdb.set_trace()
+
         # if called without positional arg, return partially applied
         # aspect
         if origin is None:
