@@ -126,4 +126,3 @@ class MultiAspect(TestCase):
         self.assertEqual(y.b, x.b)
         self.assertEqual(y.c, x.c)
         self.assertEqual(y.f(), x.f())
-

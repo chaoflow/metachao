@@ -116,7 +116,7 @@ class Workbench(object):
             # getattr fallback to origin, setattr and delattr on new
             self.dct['__getattr__'] = lambda _, name: getattr(origin, name)
 
-            # empty __init__ needed if a later aspects plumbs it
+            # empty __init__ needed if a later aspect plumbs it
             self.dct['__init__'] = lambda *a, **kw : None
             self.dct['__metachao_prototype__'] = origin
 
@@ -175,6 +175,7 @@ class AspectMeta(type):
         instructions = Instructions(aspect)
 
         # walk the mro, w/o object, gathering/creating instructions
+        # XXX: not sure whether that is good
         for cls in getmro(aspect)[:-1]:
             for name, item in cls.__dict__.iteritems():
                 # ignored attributes
