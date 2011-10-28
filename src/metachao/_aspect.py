@@ -75,6 +75,8 @@ class Workbench(object):
         self.kw = kw
         self.dct = dict()
         if isclass(origin):
+            # Aspect application does not change the name. This can
+            # lead to messages like "... expects a.A not a.A".
             self.name = origin.__name__
             blacklist = DICT_KEYS_OF_PLAIN_CLASS + [
                 '__metachao_origin__',
@@ -87,6 +89,9 @@ class Workbench(object):
             self.baseclasses = origin.__bases__
             self.type = type(origin)
             self.dct['__metachao_origin__'] = origin
+            # Aspect application does not change the module. If that
+            # is not what you want, consider subclassing first.
+            self.dct['__module__'] = origin.__module__
         else:
             # we are pretty much creating an object that uses origin
             # as prototype.
