@@ -38,6 +38,7 @@ class Instructions(object):
 
     def __call__(self, workbench):
         if type(workbench.origin) is AspectMeta:
+            raise Error
             curinstr = workbench.dct[self.attrname]
             workbench.dct[self.attrname] = curinstr + self.instructions
         else:
@@ -139,6 +140,26 @@ class AspectMeta(type):
                 raise NeedKw
             return Partial(aspect, **kw)
 
+        # if called with another aspect compose them
+        if type(origin) is AspectMeta:
+            if kw:
+                raise Unsupported("kw and composition not supported")
+            name = "AspectComposition"
+            aspects = []
+            for asp in [aspect, origin]:
+                if hasattr(asp, '__metachao_compose__'):
+                    aspects.extend(asp.__metachao_compose__)
+                else:
+                    aspects.append(asp)
+            return AspectMeta(name, (Aspect,), dict(__metachao_compose__=aspects))
+
+        # if composition, chain them
+        if hasattr(aspect, '__metachao_compose__'):
+            for asp in reversed(aspect.__metachao_compose__):
+                origin = asp(origin, **kw)
+            return origin
+
+        # a single aspects called on a normal class or an instance
         workbench = Workbench(origin, **kw)
         instrs = Instructions(aspect)
         instrs(workbench)
