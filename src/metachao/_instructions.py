@@ -83,6 +83,10 @@ class Instruction(object):
         if name is not None:
             self.__name__ = name
 
+    def __repr__(self):
+        return "<%s '%s' %r>" % (self.__class__.__name__,
+                                   self.name, self.payload)
+
 
 class EitherOrInstruction(Instruction):
     """Instructions where either an existing value or the provided one is used
