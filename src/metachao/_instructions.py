@@ -1,3 +1,5 @@
+import logging
+
 from functools import wraps
 from inspect import getmembers
 from inspect import getmro
@@ -5,6 +7,9 @@ from inspect import isclass
 
 from metachao.exceptions import AspectCollision
 from metachao.tools import partial
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('metachao')
 
 
 def payload(item):
@@ -52,6 +57,7 @@ class Instruction(object):
                                          {}).setdefault(self.name, [])
         if self.apply(workbench, stack):
             stack.append(self)
+            log.debug('effective: %s', self)
 
     def __eq__(self, right):
         """Instructions are equal if ...
@@ -93,6 +99,7 @@ class EitherOrInstruction(Instruction):
     """
     def apply(self, workbench, stack):
         if stack and (stack[-1] == self):
+            log.debug('skipping eitheror: %r', self)
             return False
         if self.check(workbench, stack):
             workbench.dct[self.name] = self.value(workbench)
