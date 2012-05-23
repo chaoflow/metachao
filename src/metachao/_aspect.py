@@ -141,7 +141,8 @@ class AspectMeta(type):
             return Partial(aspect, **kw)
 
         workbench = Workbench(origin, **kw)
-        Instructions(aspect)(workbench)
+        instrs = Instructions(aspect)
+        instrs(workbench)
 
             #raise AspectCollision(instr.name, aspect, target)
 
