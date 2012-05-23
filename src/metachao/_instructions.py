@@ -39,7 +39,7 @@ class Instruction(object):
     def payload(self):
         return payload(self)
 
-    def apply(self, workbench, stack):
+    def apply(self, workbench, effective):
         """apply the instruction
 
         May raise exceptions:
@@ -50,14 +50,11 @@ class Instruction(object):
         raise NotImplementedError  # pragma NO COVERAGE
 
     def __call__(self, workbench):
-        # XXX: record keywords also on stack?
-        # XXX: we currently change the stack of all classes in the chain
-        # probably a deep copy should be created
-        stack = workbench.dct.setdefault('__metachao_stacks__',
-                                         {}).setdefault(self.name, [])
-        if self.apply(workbench, stack):
-            stack.append(self)
+        # XXX: record keywords also with effective instructions?
+        effective = workbench.dct.setdefault('__metachao_effective__', {})
+        if self.apply(workbench, effective):
             log.debug('effective: %s', self)
+            effective[self.name] = self
 
     def __eq__(self, right):
         """Instructions are equal if ...
@@ -97,15 +94,15 @@ class Instruction(object):
 class EitherOrInstruction(Instruction):
     """Instructions where either an existing value or the provided one is used
     """
-    def apply(self, workbench, stack):
-        if stack and (stack[-1] == self):
+    def apply(self, workbench, effective):
+        if effective.get(self.name) is self:
             log.debug('skipping eitheror: %r', self)
             return False
-        if self.check(workbench, stack):
+        if self.check(workbench, effective):
             workbench.dct[self.name] = self.value(workbench)
         return True
 
-    def check(self, workbench, stack):
+    def check(self, workbench, effective):
         """Check whether to apply an instruction
 
         ``bases`` is a wrapper for all base classes of the plumbing and
@@ -118,15 +115,16 @@ class EitherOrInstruction(Instruction):
 
 
 class default(EitherOrInstruction):
-    def check(self, workbench, stack):
+    def check(self, workbench, effective):
         return self.name not in (x[0] for x in getmembers(workbench.origin))
 
 
 class finalize(EitherOrInstruction):
-    def check(self, workbench, stack):
+    def check(self, workbench, effective):
         if self.name not in workbench.dct:
             return True
-        if not stack or isinstance(stack[-1], finalize):
+        if effective.get(self.name) is None or \
+                isinstance(effective.get(self.name), finalize):
             raise AspectCollision("%s\n  %s\n  with: %s" % (
                 self.name, workbench.dct[self.name], self.__parent__))
         return True
@@ -149,12 +147,12 @@ class aspectkw(finalize):
 
 
 class overwrite(EitherOrInstruction):
-    def check(self, workbench, stack):
+    def check(self, workbench, effective):
         if self.name not in workbench.dct:
             return True
-        if not stack:
+        if effective.get(self.name) is None:
             return False
-        if isinstance(stack[-1], finalize):
+        if isinstance(effective.get(self.name), finalize):
             # XXX: should this be a collision? maybe things defined on
             # the plumbing itself should be only similar to finalize,
             # but not finalize.
@@ -163,7 +161,7 @@ class overwrite(EitherOrInstruction):
 
 
 class plumb(Instruction):
-    def apply(self, workbench, stack):
+    def apply(self, workbench, effective):
         # find raw _next function
         try:
             _next = workbench.dct[self.name]

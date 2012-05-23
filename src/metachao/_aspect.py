@@ -91,7 +91,8 @@ class Workbench(object):
             self.dct['__metachao_origin__'] = origin
             # Aspect application does not change the module. If that
             # is not what you want, consider subclassing first.
-            self.dct['__module__'] = origin.__module__
+            # XXX: it totally should indicate that sth is different
+            #self.dct['__module__'] = origin.__module__
         else:
             # we are pretty much creating an object that uses origin
             # as prototype.
