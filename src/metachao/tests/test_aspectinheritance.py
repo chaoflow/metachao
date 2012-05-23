@@ -15,11 +15,14 @@ class AspectInheritance(TestCase):
             a = 2
 
         class A(object):
-            pass
+            __metachao_effective__ = {}
 
         a1 = asp1(A)()
+        b = base(A)()
         a2 = asp2(A)()
 
+        self.assertEqual(b.a, 0)
+        self.assertEqual(b.b, 0)
         self.assertEqual(a1.a, 1)
         self.assertEqual(a1.b, 0)
         self.assertEqual(a2.a, 2)
