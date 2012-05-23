@@ -126,6 +126,10 @@ class Workbench(object):
             self.dct['__init__'] = lambda *a, **kw : None
             self.dct['__metachao_prototype__'] = origin
 
+        if getattr(origin, '__metachao_effective__', None) is not None:
+            self.dct['__metachao_effective__'] = \
+                origin.__metachao_effective__.copy()
+
 
 class AspectMeta(type):
     """meta class for aspects
