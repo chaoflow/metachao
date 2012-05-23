@@ -54,7 +54,6 @@ class Instructions(object):
     def __getattr__(self, name):
         return getattr(self.instructions, name)
 
-    # XXX: needed explicitly to make it iterable?
     def __iter__(self):
         return self.instructions.__iter__()
 
