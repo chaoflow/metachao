@@ -8,7 +8,7 @@ from inspect import isclass
 from metachao.exceptions import AspectCollision
 from metachao.tools import partial
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('metachao')
 
 
