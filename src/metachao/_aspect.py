@@ -185,6 +185,7 @@ class AspectMeta(type):
             if type(cls) is AspectMeta and kw:
                 raise OldCodePath
                 return Partial(cls, **kw)
+            cls.__metachao_class__ = cls
             return cls
         return cls()
 
