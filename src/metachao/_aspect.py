@@ -183,6 +183,7 @@ class AspectMeta(type):
             classImplements(cls, *tuple(implementedBy(aspect)))
         if isclass(origin):
             if type(cls) is AspectMeta and kw:
+                raise OldCodePath
                 return Partial(cls, **kw)
             return cls
         return cls()
