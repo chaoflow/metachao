@@ -160,6 +160,30 @@ class overwrite(EitherOrInstruction):
         return True
 
 
+class AllNext(object):
+    """access to all _next methods
+    """
+    __instance = None
+
+    def __init__(self, dct, instance=None):
+        self.__dct = dct
+        if instance is not None:
+            self.__instance = instance
+
+    def __getattribute__(self, name):
+        """all attribute lookups are forwarded into the dct
+        """
+        dct = object.__getattribute__(self, '_AllNext__dct')
+        instance = object.__getattribute__(self, '_AllNext__instance')
+        try:
+            attr = dct[name]
+        except KeyError:
+            raise AttributeError(name)
+        if instance:
+            attr = attr.__get__(instance, instance.__class__)
+        return attr
+
+
 class plumb(Instruction):
     def apply(self, workbench, effective):
         # find raw _next function
@@ -187,10 +211,20 @@ class plumb(Instruction):
             @wraps(payload)
             def wrapper(self, *args, **kw):
                 boundnext = _next.__get__(self, self.__class__)
-                return payload(boundnext, self, *args, **kw)
+                def _nextall(*args2, **kw2):
+                    return boundnext(*args2, **kw2)
+                # All _next methods, not just for the current name,
+                # are available via _next.all
+                _nextall.all = AllNext(workbench.dct, self)
+                return payload(_nextall, self, *args, **kw)
         else:
             @wraps(payload)
             def wrapper(self, *args, **kw):
-                return payload(_next, self, *args, **kw)
+                def _nextall(*args2, **kw2):
+                    return _next(*args2, **kw2)
+                # All _next methods, not just for the current name,
+                # are available via _next.all
+                _nextall.all = AllNext(workbench.dct)
+                return payload(_nextall, self, *args, **kw)
         workbench.dct[self.name] = wrapper
         return True
