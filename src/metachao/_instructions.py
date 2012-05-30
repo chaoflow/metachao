@@ -133,12 +133,21 @@ class finalize(EitherOrInstruction):
 class aspectkw(finalize):
     """define a kw for the aspect
     """
-    def __init__(self, **kw):
-        if len(kw) != 1:
+    _key = None
+
+    @property
+    def key(self):
+        return self._key or self.name.strip('_')
+
+    def __init__(self, *args, **kw):
+        if len(kw) + len(args) != 1:
             raise NeedExactlyOneKeyword
         # finalize.apply will use item
-        self.item = kw.values()[0]
-        self.key = kw.keys()[0]
+        if kw:
+            self.item = kw.values()[0]
+            self._key = kw.keys()[0]
+        else:
+            self.item = args[0]
 
     def value(self, workbench):
         if self.key in workbench.kw:
