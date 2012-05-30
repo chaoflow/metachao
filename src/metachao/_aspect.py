@@ -8,7 +8,9 @@ except ImportError:                   # pragma NO COVERAGE
     ZOPE_INTERFACE_AVAILABLE = False  # pragma NO COVERAGE
 
 from metachao._instructions import Instruction
+from metachao._instructions import aspectkw
 from metachao._instructions import overwrite
+from metachao._instructions import plumb
 from metachao.exceptions import AspectCollision
 from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
@@ -229,6 +231,20 @@ class AspectMeta(type):
                 item.__name__ = name
                 item.__parent__ = aspect
                 instructions.append(item)
+
+        # for (every) aspectkw we need to plumb __init__
+        aspectkws = [x for x in instructions if isinstance(x, aspectkw)]
+        if aspectkws:
+            @plumb
+            def __init__(_next, self, *args, **kw):
+                for x in aspectkws:
+                    value = kw.pop(x.key, x.item)
+                    if value is not x.item:
+                        setattr(self, x.name, value)
+                _next(*args, **kw)
+            __init__.__name__ = '__init__'
+            __init__.__parent__ = aspect
+            instructions.append(__init__)
 
         # # An existing docstring is an implicit plumb instruction for __doc__
         # if aspect.__doc__ is not None:
