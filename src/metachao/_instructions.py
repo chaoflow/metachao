@@ -144,6 +144,7 @@ class aspectkw(finalize):
         if self.key in workbench.kw:
             return workbench.kw[self.key]
         return self.payload
+cfg = aspectkw
 
 
 class overwrite(EitherOrInstruction):
