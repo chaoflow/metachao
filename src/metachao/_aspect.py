@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from inspect import getmembers, getmro, isclass
 
 try:
@@ -133,7 +134,7 @@ class Workbench(object):
                 origin.__metachao_effective__.copy()
 
 
-class AspectMeta(type):
+class AspectMeta(ABCMeta):
     """meta class for aspects
     """
     def __call__(aspect, origin=None, *args, **kw):
@@ -213,6 +214,10 @@ class AspectMeta(type):
         for cls in getmro(aspect)[:-1]:
             for name, item in cls.__dict__.iteritems():
                 # ignored attributes
+                if name.startswith('_abc_'):
+                    continue
+                if name == '__abstractmethods__':
+                    continue
                 if name.startswith('__metachao_'):
                     continue
                 if name in (
