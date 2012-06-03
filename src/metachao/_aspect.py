@@ -146,6 +146,8 @@ class AspectMeta(ABCMeta):
         if origin is None:
             if not kw:
                 raise NeedKw
+            # XXX: this does not play nice with ABC
+            # XXX: return an aspect that is differently configured
             return Partial(aspect, **kw)
 
         # if called with another aspect compose them
@@ -159,12 +161,17 @@ class AspectMeta(ABCMeta):
                     aspects.extend(asp.__metachao_compose__)
                 else:
                     aspects.append(asp)
-            return AspectMeta(name, (Aspect,), dict(__metachao_compose__=aspects))
+            composite = AspectMeta(name, (Aspect,), dict(__metachao_compose__=aspects))
+            origin.register(composite)
+            aspect.register(composite)
+            return composite
 
         # if composition, chain them
         if hasattr(aspect, '__metachao_compose__'):
             for asp in reversed(aspect.__metachao_compose__):
                 origin = asp(origin, **kw)
+            if type(origin) is type:
+                aspect.register(origin)
             return origin
 
         # a single aspects called on a normal class or an instance
