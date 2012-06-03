@@ -76,14 +76,17 @@ class AspectABC(TestCase):
         a2 = asp(A())
 
         self.assertTrue(isinstance(a1, AspA))
-        # XXX; this not working is bad
-        #self.assertTrue(isinstance(a1, A))
-        #self.assertTrue(isinstance(a1, Base))
+
+        # XXX; how bad is this?
+        self.assertFalse(isinstance(a1, A))
+        self.assertTrue(isinstance(a1, Base))
         self.assertTrue(isinstance(a1, asp))
         self.assertTrue(isinstance(a1, asp1))
         self.assertTrue(isinstance(a1, asp2))
         self.assertTrue(isinstance(a1, base))
-        # XXX; this not working is bad
+
+        # XXX: a2 is using A() as a prototype
+        # What should it be an instance of?
         #self.assertTrue(isinstance(a2, A))
         #self.assertTrue(isinstance(a2, Base))
         #self.assertTrue(isinstance(a2, asp))
