@@ -24,25 +24,46 @@ class AspectABC(TestCase):
         Asp2 = asp2(A)
         AspA = asp(A)
 
+        @asp1
+        class Asp1_(A):
+            pass
+
+        @asp2
+        class Asp2_(A):
+            pass
+
+        @asp
+        class AspA_(A):
+            pass
+
         self.assertTrue(issubclass(asp1, base))
         self.assertTrue(issubclass(asp2, base))
         self.assertTrue(issubclass(asp, base))
         self.assertTrue(issubclass(A, Base))
 
-        # XXX; this not working is bad
-        #self.assertTrue(issubclass(Asp1, A))
+        # XXX; how bad is this?
+        self.assertFalse(issubclass(Asp1, A))
+        # but:
+        self.assertTrue(issubclass(Asp1_, A))
+
         self.assertTrue(issubclass(Asp1, Base))
         self.assertTrue(issubclass(Asp1, asp1))
         self.assertTrue(issubclass(Asp1, base))
 
-        # XXX; this not working is bad
-        #self.assertTrue(issubclass(Asp2, A))
+        # XXX; how bad is this?
+        self.assertFalse(issubclass(Asp2, A))
+        # but:
+        self.assertTrue(issubclass(Asp2_, A))
+
         self.assertTrue(issubclass(Asp2, Base))
         self.assertTrue(issubclass(Asp2, asp2))
         self.assertTrue(issubclass(Asp2, base))
 
-        # XXX; this not working is bad
-        #self.assertTrue(issubclass(AspA, A))
+        # XXX; how bad is this?
+        self.assertFalse(issubclass(AspA, A))
+        # but:
+        self.assertTrue(issubclass(AspA_, A))
+
         self.assertTrue(issubclass(AspA, Base))
         self.assertTrue(issubclass(AspA, asp1))
         self.assertTrue(issubclass(AspA, asp2))
