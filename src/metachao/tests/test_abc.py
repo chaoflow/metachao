@@ -9,9 +9,11 @@ class AspectABC(TestCase):
         class base(Aspect):
             pass
         class asp1(base):
-            pass
+            def register(self):
+                return 1
         class asp2(base):
-            pass
+            def register(self):
+                return 2
 
         asp = asp1(asp2)
 

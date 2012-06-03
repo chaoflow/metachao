@@ -162,8 +162,8 @@ class AspectMeta(ABCMeta):
                 else:
                     aspects.append(asp)
             composite = AspectMeta(name, (Aspect,), dict(__metachao_compose__=aspects))
-            origin.register(composite)
-            aspect.register(composite)
+            type(origin).register(origin, composite)
+            type(aspect).register(aspect, composite)
             return composite
 
         # if composition, chain them
@@ -171,7 +171,7 @@ class AspectMeta(ABCMeta):
             for asp in reversed(aspect.__metachao_compose__):
                 origin = asp(origin, **kw)
             if type(origin) is type:
-                aspect.register(origin)
+                type(aspect).register(aspect, origin)
             return origin
 
         # a single aspects called on a normal class or an instance
@@ -189,7 +189,7 @@ class AspectMeta(ABCMeta):
         # target class, but a new dictionary with the aspect applied.
         cls = workbench.type(workbench.name, workbench.baseclasses,
                              workbench.dct)
-        aspect.register(cls)
+        type(aspect).register(aspect, cls)
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
         if isclass(origin):
