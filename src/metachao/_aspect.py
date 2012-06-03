@@ -182,6 +182,7 @@ class AspectMeta(ABCMeta):
         # target class, but a new dictionary with the aspect applied.
         cls = workbench.type(workbench.name, workbench.baseclasses,
                              workbench.dct)
+        aspect.register(cls)
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
         if isclass(origin):
