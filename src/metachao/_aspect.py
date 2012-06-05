@@ -246,14 +246,17 @@ class AspectMeta(ABCMeta):
                 instructions.append(item)
 
         # for (every) aspectkw we need to plumb __init__
-        aspectkws = [x for x in instructions if isinstance(x, aspectkw)]
+        aspectkws = dict([(x.key, x) for x in instructions if isinstance(x, aspectkw)])
         if aspectkws:
             @plumb
             def __init__(_next, self, *args, **kw):
-                for x in aspectkws:
-                    value = kw.pop(x.key, x.item)
-                    if value is not x.item:
-                        setattr(self, x.name, value)
+                for k in kw.keys():
+                    if k not in aspectkws:
+                        continue
+                    value = kw.pop(k)
+                    akw = aspectkws[k]
+                    if value is not akw.item:
+                        setattr(self, akw.name, value)
                 _next(*args, **kw)
             __init__.__name__ = '__init__'
             __init__.__parent__ = aspect
