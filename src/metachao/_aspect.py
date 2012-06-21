@@ -87,8 +87,6 @@ class Workbench(object):
             self.dct.update(((k, v)
                              for k, v in origin.__dict__.iteritems()
                              if k not in blacklist))
-            # XXX: fix naming (also see self.baseclasses)
-            self.bases = Bases(origin)
             self.baseclasses = origin.__bases__
             self.type = type(origin)
             self.dct['__metachao_origin__'] = origin
