@@ -119,18 +119,7 @@ class default(EitherOrInstruction):
         return self.name not in (x[0] for x in getmembers(workbench.origin))
 
 
-class finalize(EitherOrInstruction):
-    def check(self, workbench, effective):
-        if self.name not in workbench.dct:
-            return True
-        if effective.get(self.name) is None or \
-                isinstance(effective.get(self.name), finalize):
-            raise AspectCollision("%s\n  %s\n  with: %s" % (
-                self.name, workbench.dct[self.name], self.__parent__))
-        return True
-
-
-class aspectkw(finalize):
+class aspectkw(default):
     """define a kw for the aspect
     """
     _key = None
@@ -142,7 +131,7 @@ class aspectkw(finalize):
     def __init__(self, *args, **kw):
         if len(kw) + len(args) != 1:
             raise NeedExactlyOneKeyword
-        # finalize.apply will use item
+        # default.apply will use item
         if kw:
             self.item = kw.values()[0]
             self._key = kw.keys()[0]
@@ -157,15 +146,12 @@ cfg = aspectkw
 
 
 class overwrite(EitherOrInstruction):
+    """Internal instruction for undecorated attributes
+    """
     def check(self, workbench, effective):
         if self.name not in workbench.dct:
             return True
         if effective.get(self.name) is None:
-            return False
-        if isinstance(effective.get(self.name), finalize):
-            # XXX: should this be a collision? maybe things defined on
-            # the plumbing itself should be only similar to finalize,
-            # but not finalize.
             return False
         return True
 

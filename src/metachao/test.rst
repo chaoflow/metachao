@@ -119,15 +119,15 @@ default instruction::
     >>> A.c
     3
 
-overwrite instruction::
+overwrite instruction is implicit::
 
     >>> class f(Aspect):
-    ...     a = aspect.overwrite(1)
-    ...     b = aspect.overwrite(1)
-    ...     c = aspect.overwrite(1)
+    ...     a = 1
+    ...     b = 1
+    ...     c = 1
 
     >>> class g(Aspect):
-    ...     c = aspect.overwrite(2)
+    ...     c = 2
 
     >>> class Base(object):
     ...     b = 3
@@ -142,22 +142,6 @@ overwrite instruction::
     >>> C.b
     1
     >>> C.c
-    1
-
-finalize instruction::
-
-    >>> class f(Aspect):
-    ...     a = aspect.finalize(1)
-
-    >>> class g(Aspect):
-    ...     a = aspect.overwrite(2)
-
-    >>> @f
-    ... @g
-    ... class C(object):
-    ...     pass
-
-    >>> C.a
     1
 
 plumb instruction::
