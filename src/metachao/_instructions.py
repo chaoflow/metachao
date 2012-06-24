@@ -37,7 +37,7 @@ class Instruction(object):
 
         return True (applied) / False (not applied)
         """
-        raise NotImplementedError  # pragma NO COVERAGE
+        raise NotImplementedError  #pragma NO COVERAGE
 
     def __call__(self, workbench):
         # XXX: record keywords also with effective instructions?
@@ -98,7 +98,7 @@ class EitherOrInstruction(Instruction):
         ``bases`` is a wrapper for all base classes of the plumbing and
         provides ``__contains__``, instructions may or may not need it.
         """
-        raise NotImplementedError  # pragma NO COVERAGE
+        raise NotImplementedError  #pragma NO COVERAGE
 
     def value(self, workbench):
         return self.payload

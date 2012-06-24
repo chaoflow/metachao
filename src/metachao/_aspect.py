@@ -5,8 +5,8 @@ try:
     from zope.interface import classImplements
     from zope.interface import implementedBy
     ZOPE_INTERFACE_AVAILABLE = True
-except ImportError:                   # pragma NO COVERAGE
-    ZOPE_INTERFACE_AVAILABLE = False  # pragma NO COVERAGE
+except ImportError:                   #pragma NO COVERAGE
+    ZOPE_INTERFACE_AVAILABLE = False  #pragma NO COVERAGE
 
 from metachao._instructions import Instruction
 from metachao._instructions import aspectkw
