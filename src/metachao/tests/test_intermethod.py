@@ -23,7 +23,11 @@ class InterMethod(TestCase):
             def f(self):
                 return 10
 
-        #self.assertEqual(a1(C)().f(), 10)
-        #self.assertEqual(a1(C)().g(), 20)
-        #self.assertEqual(a1(C()).f(), 10)
-        #self.assertEqual(a1(C()).g(), 20)
+        self.assertEqual(a1(C)().f(), 10)
+        self.assertEqual(a1(C)().g(), 20)
+        self.assertEqual(a1(C()).f(), 10)
+
+        # ATTENTION: C.f is picked instead of a1.f, because g is bound
+        # to the C instance, not the new instance that uses the C
+        # instance as prototype
+        self.assertEqual(a1(C()).g(), 2)
