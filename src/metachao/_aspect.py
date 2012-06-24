@@ -12,7 +12,6 @@ from metachao._instructions import Instruction
 from metachao._instructions import aspectkw
 from metachao._instructions import overwrite
 from metachao._instructions import plumb
-from metachao.exceptions import AspectCollision
 from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
 

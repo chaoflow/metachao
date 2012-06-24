@@ -5,7 +5,6 @@ from inspect import getmembers
 from inspect import getmro
 from inspect import isclass
 
-from metachao.exceptions import AspectCollision
 from metachao.tools import partial
 
 #logging.basicConfig(level=logging.DEBUG)
