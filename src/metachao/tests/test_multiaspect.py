@@ -5,11 +5,6 @@ from metachao.aspect import Aspect
 
 
 class MultiAspect(TestCase):
-    def runTest(self):
-        self.test1()
-        self.test2()
-        self.test3()
-
     def test1(self):
         class a1(Aspect):
             a = 1

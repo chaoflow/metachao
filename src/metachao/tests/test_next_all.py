@@ -6,9 +6,6 @@ from metachao.aspect import Aspect
 
 class AllMethodsViaNext(TestCase):
     def runTest(self):
-        self.test1()
-
-    def test1(self):
         class C(object):
             def f(self):
                 return 1
