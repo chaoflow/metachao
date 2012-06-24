@@ -46,19 +46,19 @@ class Instruction(object):
             log.debug('effective: %s', self)
             effective[self.name] = self
 
-    def __eq__(self, right):
-        """Instructions are equal if ...
+    # def __eq__(self, right):
+    #     """Instructions are equal if ...
 
-        - they are the very same
-        - their class is the very same and their payloads are equal
-        """
-        if self is right:
-            return True
-        if not self.__class__ is right.__class__:
-            return False
-        if self.name != right.name or self.payload != right.payload:
-            return False
-        return True
+    #     - they are the very same
+    #     - their class is the very same and their payloads are equal
+    #     """
+    #     if self is right:
+    #         return True
+    #     if not self.__class__ is right.__class__:
+    #         return False
+    #     if self.name != right.name or self.payload != right.payload:
+    #         return False
+    #     return True
 
     def __init__(self, item, name=None):
         """
