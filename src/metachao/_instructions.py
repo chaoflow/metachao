@@ -107,7 +107,11 @@ class EitherOrInstruction(Instruction):
 
 class default(EitherOrInstruction):
     def check(self, workbench, effective):
-        return not hasattr(workbench.origin, self.name)
+        for x in getmembers(workbench.origin):
+            if self.name == x[0]:
+                return False
+        else:
+            return True
 
 
 class aspectkw(default):
