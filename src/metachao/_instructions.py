@@ -171,10 +171,12 @@ class AllNext(object):
 class plumb(Instruction):
     def apply(self, workbench, effective):
         payload = self.payload
+        name = self.name
         _next_method = getattr(workbench.origin, self.name)
         if type(workbench.origin) is type:
             @wraps(payload)
             def wrapper(self, *args, **kw):
+                __traceback_info__ = name
                 def _next(*args, **kw):
                     return _next_method(self, *args, **kw)
                 # All _next methods, not just for the current name,
@@ -184,6 +186,7 @@ class plumb(Instruction):
         else:
             @wraps(payload)
             def wrapper(self, *args, **kw):
+                __traceback_info__ = name
                 def _next(*args, **kw):
                     return _next_method(*args, **kw)
                 # All _next methods, not just for the current name,
