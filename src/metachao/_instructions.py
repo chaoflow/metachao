@@ -12,19 +12,6 @@ from metachao.tools import partial
 log = logging.getLogger('metachao')
 
 
-def payload(item):
-    """Get to the payload through a chain of instructions
-
-        >>> class Foo: pass
-        >>> payload(Instruction(Instruction(Foo))) is Foo
-        True
-    """
-    # XXX: check in what case this is needed
-    while isinstance(item, Instruction):
-        item = item.item
-    return item
-
-
 class Instruction(object):
     __name__ = None
     __parent__ = None
@@ -37,7 +24,11 @@ class Instruction(object):
 
     @property
     def payload(self):
-        return payload(self)
+        item = self
+        # XXX: check in what case this is needed
+        while isinstance(item, Instruction):
+            item = item.item
+        return item
 
     def apply(self, workbench, effective):
         """apply the instruction
