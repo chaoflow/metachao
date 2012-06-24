@@ -23,9 +23,8 @@ class Sanity(TestCase):
             pass
         c2 = C2()
 
-        # XXX: broken
-        #self.assertTrue(issubclass(C1, B))
-        #self.assertTrue(isinstance(c1, B))
+        self.assertTrue(issubclass(C1, B))
+        self.assertTrue(isinstance(c1, B))
         self.assertTrue(isinstance(c1, C1))
         self.assertTrue(issubclass(C2, B))
         self.assertTrue(isinstance(c2, B))

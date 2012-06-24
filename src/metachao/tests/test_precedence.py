@@ -9,7 +9,7 @@ class Precedence(TestCase):
         self.default()
         self.undecorated()
         # for now we try how it feels if undecorated attributes just
-        # overwrite like with inheritance - it feels more pythonic
+        # overwrite like with inheritance - so far it feels more pythonic
         #self.overwrite()
         #self.finalize()
 
@@ -59,9 +59,8 @@ class Precedence(TestCase):
         c2 = C2()
         ab = a(B())
 
-        # XXX: broken
-        #self.assertEqual(C1.a, 10)
-        #self.assertEqual(C2.a, 10)
-        #self.assertEqual(c1.a, 10)
-        #self.assertEqual(c2.a, 10)
+        self.assertEqual(C1.a, 10)
+        self.assertEqual(C2.a, 10)
+        self.assertEqual(c1.a, 10)
+        self.assertEqual(c2.a, 10)
         self.assertEqual(ab.a, 10)

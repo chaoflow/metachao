@@ -138,7 +138,7 @@ overwrite instruction is implicit::
     ...     a = 4
 
     >>> C.a
-    4
+    1
     >>> C.b
     1
     >>> C.c

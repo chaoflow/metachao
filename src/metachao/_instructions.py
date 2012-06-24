@@ -116,7 +116,7 @@ class EitherOrInstruction(Instruction):
 
 class default(EitherOrInstruction):
     def check(self, workbench, effective):
-        return self.name not in (x[0] for x in getmembers(workbench.origin))
+        return not hasattr(workbench.origin, self.name)
 
 
 class aspectkw(default):
@@ -149,10 +149,6 @@ class overwrite(EitherOrInstruction):
     """Internal instruction for undecorated attributes
     """
     def check(self, workbench, effective):
-        if self.name not in workbench.dct:
-            return True
-        if effective.get(self.name) is None:
-            return False
         return True
 
 
@@ -161,20 +157,17 @@ class AllNext(object):
     """
     __instance = None
 
-    def __init__(self, dct, instance=None):
-        self.__dct = dct
+    def __init__(self, origin, instance=None):
+        self.__origin = origin
         if instance is not None:
             self.__instance = instance
 
     def __getattribute__(self, name):
-        """all attribute lookups are forwarded into the dct
+        """all attribute lookups are forwarded to origin
         """
-        dct = object.__getattribute__(self, '_AllNext__dct')
+        origin = object.__getattribute__(self, '_AllNext__origin')
         instance = object.__getattribute__(self, '_AllNext__instance')
-        try:
-            attr = dct[name]
-        except KeyError:
-            raise AttributeError(name)
+        attr = getattr(origin, name)
         if instance:
             attr = attr.__get__(instance, instance.__class__)
         return attr
@@ -182,45 +175,27 @@ class AllNext(object):
 
 class plumb(Instruction):
     def apply(self, workbench, effective):
-        # find raw _next function
-        try:
-            _next = workbench.dct[self.name]
-        except KeyError:
-            if not isclass(workbench.origin):
-                raise
-            for base in getmro(workbench.origin)[1:]:
-                try:
-                    _next = base.__dict__[self.name]
-                    break;
-                except KeyError:
-                    pass
-            else:
-                raise KeyError(self.name)
-        try:
-            _next.__get__
-            needs_to_be_bound = True
-        except AttributeError:
-            needs_to_be_bound = False
-        # create and set wrapper
         payload = self.payload
-        if needs_to_be_bound:
+        _next_method = getattr(workbench.origin, self.name)
+        if type(workbench.origin) is type:
             @wraps(payload)
             def wrapper(self, *args, **kw):
-                boundnext = _next.__get__(self, self.__class__)
-                def _nextall(*args2, **kw2):
-                    return boundnext(*args2, **kw2)
+                def _next(*args, **kw):
+                    return _next_method(self, *args, **kw)
                 # All _next methods, not just for the current name,
                 # are available via _next.all
-                _nextall.all = AllNext(workbench.dct, self)
-                return payload(_nextall, self, *args, **kw)
+                _next.all = AllNext(workbench.origin, self)
+                return payload(_next, self, *args, **kw)
         else:
             @wraps(payload)
             def wrapper(self, *args, **kw):
-                def _nextall(*args2, **kw2):
-                    return _next(*args2, **kw2)
+                def _next(*args, **kw):
+                    return _next_method(*args, **kw)
                 # All _next methods, not just for the current name,
                 # are available via _next.all
-                _nextall.all = AllNext(workbench.dct)
-                return payload(_nextall, self, *args, **kw)
+                _next.all = AllNext(workbench.origin)
+                return payload(_next, self, *args, **kw)
+
+        # set wrapper
         workbench.dct[self.name] = wrapper
         return True

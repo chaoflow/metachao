@@ -81,15 +81,9 @@ class Workbench(object):
             # Aspect application does not change the name. This can
             # lead to messages like "... expects a.A not a.A".
             self.name = origin.__name__
-            blacklist = DICT_KEYS_OF_PLAIN_CLASS + [
-                '__metachao_origin__',
-                ]
-            self.dct.update(((k, v)
-                             for k, v in origin.__dict__.iteritems()
-                             if k not in blacklist))
-            self.baseclasses = origin.__bases__
+            self.baseclasses = (origin,)
             self.type = type(origin)
-            self.dct['__metachao_origin__'] = origin
+
             # Aspect application does not change the module. If that
             # is not what you want, consider subclassing first.
             # XXX: it totally should indicate that sth is different

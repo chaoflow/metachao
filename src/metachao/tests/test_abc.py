@@ -43,29 +43,20 @@ class AspectABC(TestCase):
         self.assertTrue(issubclass(asp, base))
         self.assertTrue(issubclass(A, Base))
 
-        # XXX; how bad is this?
-        self.assertFalse(issubclass(Asp1, A))
-        # but:
+        self.assertTrue(issubclass(Asp1, A))
         self.assertTrue(issubclass(Asp1_, A))
-
         self.assertTrue(issubclass(Asp1, Base))
         self.assertTrue(issubclass(Asp1, asp1))
         self.assertTrue(issubclass(Asp1, base))
 
-        # XXX; how bad is this?
-        self.assertFalse(issubclass(Asp2, A))
-        # but:
+        self.assertTrue(issubclass(Asp2, A))
         self.assertTrue(issubclass(Asp2_, A))
-
         self.assertTrue(issubclass(Asp2, Base))
         self.assertTrue(issubclass(Asp2, asp2))
         self.assertTrue(issubclass(Asp2, base))
 
-        # XXX; how bad is this?
-        self.assertFalse(issubclass(AspA, A))
-        # but:
+        self.assertTrue(issubclass(AspA, A))
         self.assertTrue(issubclass(AspA_, A))
-
         self.assertTrue(issubclass(AspA, Base))
         self.assertTrue(issubclass(AspA, asp1))
         self.assertTrue(issubclass(AspA, asp2))
@@ -76,9 +67,7 @@ class AspectABC(TestCase):
         a2 = asp(A())
 
         self.assertTrue(isinstance(a1, AspA))
-
-        # XXX; how bad is this?
-        self.assertFalse(isinstance(a1, A))
+        self.assertTrue(isinstance(a1, A))
         self.assertTrue(isinstance(a1, Base))
         self.assertTrue(isinstance(a1, asp))
         self.assertTrue(isinstance(a1, asp1))
