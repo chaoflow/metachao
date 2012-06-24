@@ -38,6 +38,13 @@ class AspectABC(TestCase):
         class AspA_(A):
             pass
 
+        self.assertEqual(Asp1().register(), 1)
+        self.assertEqual(Asp2().register(), 2)
+        self.assertEqual(AspA().register(), 1)
+        self.assertEqual(Asp1_().register(), 1)
+        self.assertEqual(Asp2_().register(), 2)
+        self.assertEqual(AspA_().register(), 1)
+
         self.assertTrue(issubclass(asp1, base))
         self.assertTrue(issubclass(asp2, base))
         self.assertTrue(issubclass(asp, base))
