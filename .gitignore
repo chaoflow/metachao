@@ -4,11 +4,17 @@
 /.coverage
 /.mrsd
 /bin
+/build
 /coverage
+/cover
 /develop-eggs
 /devsrc
 /dist
 /eggs
 /eggs-mrsd
 /htmlcov
+/include
+/lib
+/man
+/nixenv
 /parts
