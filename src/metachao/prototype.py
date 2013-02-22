@@ -1,3 +1,14 @@
+def derive(prototype, **kw):
+    name = "Prototyper"
+    bases = ()
+    dct = {
+        '__getattr__': lambda self, name: getattr(prototype, name),
+        }
+    Prototyper = type(name, bases, dct)
+    derived = Prototyper()
+    return derived
+
+
 def prototype_property(prototype, prop):
     """prototype property
 
