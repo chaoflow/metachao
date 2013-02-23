@@ -9,6 +9,16 @@ class TestPrototype(TestCase):
             def ret_x(self):
                 return self.x
 
+            @property
+            def prop_x(self):
+                return self.x
+            @prop_x.setter
+            def prop_x(self, x):
+                self.x = x
+            @prop_x.deleter
+            def prop_x(self):
+                del self.x
+
         self.K = Klass
         self.a = self.K()
         self.b = derive(self.a)
@@ -68,3 +78,26 @@ class TestPrototype(TestCase):
         self.assertEqual(self.a.ret_x(), 2)
         self.assertEqual(self.b.ret_x(), 3)
         self.assertEqual(self.c.ret_x(), 4)
+
+    def test_property_bound_to_instance_called_upon(self):
+        self.K.x = 1
+        self.a.prop_x = 2
+        self.b.prop_x = 3
+        self.c.prop_x = 4
+        self.assertEqual(self.a.x, 2)
+        self.assertEqual(self.b.x, 3)
+        self.assertEqual(self.c.x, 4)
+        self.assertEqual(self.a.prop_x, 2)
+        self.assertEqual(self.b.prop_x, 3)
+        self.assertEqual(self.c.prop_x, 4)
+        del self.c.prop_x
+        self.assertEqual(self.c.x, 3)
+        self.assertEqual(self.c.prop_x, 3)
+        del self.b.prop_x
+        self.assertEqual(self.c.x, 2)
+        self.assertEqual(self.c.prop_x, 2)
+        del self.a.prop_x
+        self.assertEqual(self.c.x, 1)
+        self.assertEqual(self.c.prop_x, 1)
+
+
