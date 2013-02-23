@@ -6,7 +6,9 @@ from metachao.prototype import derive
 class TestPrototype(TestCase):
     def setUp(self):
         class Klass(object):
-            pass
+            def ret_x(self):
+                return self.x
+
         self.K = Klass
         self.a = self.K()
         self.b = derive(self.a)
@@ -57,3 +59,12 @@ class TestPrototype(TestCase):
         self.assertEqual(self.c.x, 2)
         del self.a.x
         self.assertEqual(self.c.x, 1)
+
+    def test_method_bound_to_instance_called_upon(self):
+        self.K.x = 1
+        self.a.x = 2
+        self.b.x = 3
+        self.c.x = 4
+        self.assertEqual(self.a.ret_x(), 2)
+        self.assertEqual(self.b.ret_x(), 3)
+        self.assertEqual(self.c.ret_x(), 4)

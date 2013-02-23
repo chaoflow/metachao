@@ -1,8 +1,16 @@
+def __getattr__(self, name):
+    attr = getattr(self.__metachao_prototype__, name)
+    if callable(attr):
+        attr = attr.im_func.__get__(self, self.__class__)
+    return attr
+
+
 def derive(prototype, **kw):
     name = "Prototyper"
     bases = ()
     dct = {
-        '__getattr__': lambda self, name: getattr(prototype, name),
+        '__getattr__': __getattr__,
+        '__metachao_prototype__': prototype,
         }
     Prototyper = type(name, bases, dct)
     derived = Prototyper()
