@@ -1,7 +1,7 @@
 from inspect import getmembers
 
 
-def __getattr__(self, name):
+def prototyper__getattr__(self, name):
     attr = getattr(self.__metachao_prototype__, name)
     if callable(attr):
         attr = attr.im_func.__get__(self, self.__class__)
@@ -12,7 +12,7 @@ def derive(prototype, **kw):
     name = "Prototyper"
     bases = ()
     dct = {
-        '__getattr__': __getattr__,
+        '__getattr__': prototyper__getattr__,
         '__metachao_prototype__': prototype,
         }
     dct.update((k,v) for k,v in getmembers(prototype.__class__)
