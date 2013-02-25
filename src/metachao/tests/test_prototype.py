@@ -113,3 +113,15 @@ class TestPrototype(TestCase):
         self.assertEqual(e.ret_x(), 1)
         self.assertEqual(f.ret_x(), 3)
 
+    def test_explicitly_bind_property(self):
+        d = derive(self.c, bind=dict(prop_x=self.c))
+        e = derive(d)
+        f = derive(e, bind=dict(prop_x=e))
+        self.a.x = 1
+        d.x = 2
+        e.x = 3
+        f.x = 4
+        self.assertEqual(self.c.prop_x, 1)
+        self.assertEqual(d.prop_x, 1)
+        self.assertEqual(e.prop_x, 1)
+        self.assertEqual(f.prop_x, 3)

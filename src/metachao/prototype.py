@@ -1,13 +1,17 @@
 from inspect import getmembers
 
 
-def bound_property(prop, origin):
+def bound_property(prop, name):
+    name = '__metachao_bind_%s__' % name
     def fget(self):
-        return prop.fget(origin)
-    def fset(self):
-        return prop.fset(origin)
+        bindto = getattr(self, name, None)
+        return prop.fget(bindto is not None and bindto or self)
+    def fset(self, value):
+        bindto = getattr(self, name, None)
+        return prop.fset(bindto is not None and bindto or self, value)
     def fdel(self):
-        return prop.fdel(origin)
+        bindto = getattr(self, name, None)
+        return prop.fdel(bindto is not None and bindto or self)
     return property(fget, fset, fdel, prop.__doc__)
 
 
@@ -36,7 +40,10 @@ def derive(prototype, bind=None):
         # independent of whether bound or not
         if type(attr) is property:
             if name in to_bind:
-                attr = bound_property(attr, bind[name])
+                slot = '__metachao_bind_%s__' % name
+                dct[slot] = bind[name]
+                if not hasattr(prototype, slot):
+                    attr = bound_property(attr, name)
                 to_bind.remove(name)
             dct[name] = attr
         # methods are only put into our class' dict, if they are to be
@@ -63,6 +70,7 @@ def derive(prototype, bind=None):
     return derived
 
 
+# XXX: I don't think this will be needed anymore
 def prototype_property(prototype, prop):
     """prototype property
 
