@@ -1,18 +1,19 @@
 from inspect import getmembers
 
 
-def bound_property(prop, name):
-    name = '__metachao_bind_%s__' % name
-    def fget(self):
-        bindto = getattr(self, name, None)
-        return prop.fget(bindto is not None and bindto or self)
-    def fset(self, value):
-        bindto = getattr(self, name, None)
-        return prop.fset(bindto is not None and bindto or self, value)
-    def fdel(self):
-        bindto = getattr(self, name, None)
-        return prop.fdel(bindto is not None and bindto or self)
-    return property(fget, fset, fdel, prop.__doc__)
+class boundproperty(property):
+    def __init__(self, prop, name):
+        name = '__metachao_bind_%s__' % name
+        def bound_fget(self):
+            bindto = getattr(self, name, None)
+            return prop.fget(bindto is not None and bindto or self)
+        def bound_fset(self, value):
+            bindto = getattr(self, name, None)
+            return prop.fset(bindto is not None and bindto or self, value)
+        def bound_fdel(self):
+            bindto = getattr(self, name, None)
+            return prop.fdel(bindto is not None and bindto or self)
+        property.__init__(self, bound_fget, bound_fset, bound_fdel, prop.__doc__)
 
 
 def prototyper__getattr__(self, name):
@@ -38,12 +39,12 @@ def derive(prototype, bind=None):
     for name, attr in getmembers(prototype.__class__):
         # properties need to be put in our class' dict anyway,
         # independent of whether bound or not
-        if type(attr) is property:
+        if isinstance(attr, property):
+            if not isinstance(attr, boundproperty):
+                attr = boundproperty(attr, name)
             if name in to_bind:
                 slot = '__metachao_bind_%s__' % name
                 dct[slot] = bind[name]
-                if not hasattr(prototype, slot):
-                    attr = bound_property(attr, name)
                 to_bind.remove(name)
             dct[name] = attr
         # methods are only put into our class' dict, if they are to be
