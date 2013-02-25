@@ -1,3 +1,4 @@
+from UserDict import UserDict
 from unittest import TestCase
 
 from metachao import aspect
@@ -125,3 +126,26 @@ class TestPrototype(TestCase):
         self.assertEqual(d.prop_x, 1)
         self.assertEqual(e.prop_x, 1)
         self.assertEqual(f.prop_x, 3)
+
+    def test_dict_as_prototype(self):
+        d = dict()
+        e = derive(d, bind=dict(keys=d))
+        d['a'] = 1
+        self.assertRaises(KeyError, lambda :e['a'])
+        self.assertEqual(e.keys(), d.keys())
+
+    def test_UserDict_as_prototype(self):
+        d = UserDict()
+        e = derive(d)
+        e = derive(d, bind=dict(keys=d))
+        d['a'] = 1
+        self.assertRaises(KeyError, lambda :e['a'])
+        self.assertEqual(e.keys(), d.keys())
+
+    def test_derived_isinstance_of_prototype_class(self):
+        self.assertIsInstance(self.a, self.K)
+        self.assertIsInstance(self.b, self.K)
+        self.assertIsInstance(self.b, self.a.__class__)
+        self.assertIsInstance(self.c, self.K)
+        self.assertIsInstance(self.c, self.a.__class__)
+        self.assertIsInstance(self.c, self.b.__class__)

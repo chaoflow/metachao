@@ -1,49 +1,58 @@
 from inspect import getmembers
 
 
-class boundproperty(property):
-    def __init__(self, prop, name):
-        name = '__metachao_bind_%s__' % name
-        def bound_fget(self):
-            bindto = getattr(self, name, None)
-            return prop.fget(bindto is not None and bindto or self)
-        def bound_fset(self, value):
-            bindto = getattr(self, name, None)
-            return prop.fset(bindto is not None and bindto or self, value)
-        def bound_fdel(self):
-            bindto = getattr(self, name, None)
-            return prop.fdel(bindto is not None and bindto or self)
-        property.__init__(self, bound_fget, bound_fset, bound_fdel, prop.__doc__)
+def derive(prototype, bind=dict()):
+    class Prototyper(prototype.__class__, object):
+        def __init__(self, *args, **kw):
+            prototype.__class__.__init__(self, *args, **kw)
+            self.__metachao_prototype__ = prototype
+            self.__metachao_bind__ = dict(getattr(prototype, '__metachao_bind__', ()))
+            self.__metachao_bind__.update(bind)
 
+        def __getattribute__(self, name):
+            """realize prototyping chain
 
-def prototyper__getattr__(self, name):
-    attr = getattr(self.__metachao_prototype__, name)
-    if callable(attr):
-        bindto = getattr(self, '__metachao_bind_%s__' % (name,), None)
-        if bindto is None:
-            bindto = self
-        attr = attr.im_func.__get__(bindto, bindto.__class__)
-    return attr
+            1. instance dictionary
+            2. for callables/properties check instance's class (the ad-hoc Prototyper)
+            3. prototype getattr
+            """
+            # shortcut for things we don't want to go into the prototype chain
+            if name in (
+                '__class__',
+                '__dict__',
+                '__metachao_bind__',
+                '__metachao_prototype__',
+                ):
+                return object.__getattribute__(self, name)
 
+            # no binding, if served from instance dictionary
+            selfdict = self.__dict__
+            if name in selfdict:
+                return selfdict[name]
 
-def derive(prototype, bind=None):
-    dct = {
-        '__getattr__': prototyper__getattr__,
-        '__metachao_prototype__': prototype,
-        }
+            # check class' members for properties
+            attr = dict((k,v) for k,v in getmembers(self.__class__)
+                        if k == name and isinstance(v, property)
+                        ).get(name, ())
 
-    for name in bind or ():
-        dct['__metachao_bind_%s__' % name] = bind[name]
+            # enter prototype chain
+            if attr is ():
+                prototype = self.__metachao_prototype__
+                attr = getattr(prototype, name)
 
-    for name, attr in getmembers(prototype.__class__):
-        if isinstance(attr, property):
-            if not isinstance(attr, boundproperty):
-                attr = boundproperty(attr, name)
-            dct[name] = attr
+            # get to real function in case of methods
+            attr = getattr(attr, 'im_func', attr)
 
-    name = "Prototyper"
-    bases = ()
-    Prototyper = type(name, bases, dct)
+            # bind descriptors to instance or whatever they are supposed to
+            # bind to
+            if hasattr(attr, '__get__'):
+                bindto = self.__metachao_bind__.get(name)
+                if bindto is None:
+                    bindto = self
+                attr = attr.__get__(bindto, bindto.__class__)
+
+            return attr
+
     derived = Prototyper()
     return derived
 
