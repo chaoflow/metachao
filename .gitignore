@@ -3,6 +3,8 @@
 /.*.cfg
 /.coverage
 /.mrsd
+/.nixenv
+/.requirements
 /bin
 /build
 /coverage

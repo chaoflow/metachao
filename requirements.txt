@@ -1,0 +1,6 @@
+-e ./
+
+# testing
+nose
+coverage
+zope.interface
