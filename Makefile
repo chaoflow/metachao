@@ -1,36 +1,25 @@
-#
-# The development checkouts will be installed as siblings to the
-# current directory
-#
-REPOS_DIR=..
-
 all: check
 
-.nixenv: dev.nix
+bootstrap: dev.nix requirements.txt setup.py
 	nix-build --out-link nixenv -I ~/dev/nixos dev.nix
-	touch .nixenv
-
-bin/pip: .nixenv
 	./nixenv/bin/virtualenv --distribute --clear .
-	#rm ./bin/easy_install*
-	#echo ../../../nixenv/lib/python2.7/site-packages > lib/python2.7/site-packages/nixenv.pth
+	echo ../../../nixenv/lib/python2.7/site-packages > lib/python2.7/site-packages/nixenv.pth
+	./bin/pip install -e ../pip
+	./bin/pip install -r requirements.txt --no-index -f ""
+	./bin/easy_install -H "" metachao[test]
 
-.requirements: bin/pip requirements.txt setup.py
-	./bin/pip install -r requirements.txt
-	touch .requirements
+bin/nosetests:
+	./bin/easy_install -H "" nose
 
-print-syspath: .requirements
+print-syspath:
 	./bin/python -c 'import sys,pprint;pprint.pprint(sys.path)'
 
-check-imports: .requirements
+check-imports:
 	./bin/python -c 'import metachao'
 
-nose: .requirements
-	./bin/nosetests -w . --with-cov
+test-nose: bin/nosetests
+	./bin/nosetests -w . --with-cov --cover-branches --cover-package=metachao
 
-nose2: .requirements
-	./bin/nose2 --verbose --with-cov
+check: check-imports test-nose
 
-check: check-imports nose
-
-.PHONY: all print-syspath check check-imports nose2 nose
+.PHONY: all bootstrap print-syspath check check-imports test-nose

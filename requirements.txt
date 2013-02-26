@@ -1,6 +1,1 @@
--e ./
-
-# testing
-nose
-coverage
-zope.interface
+-e .
