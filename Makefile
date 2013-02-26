@@ -14,13 +14,10 @@ bin/nosetests:
 print-syspath:
 	./bin/python -c 'import sys,pprint;pprint.pprint(sys.path)'
 
-check-imports:
-	./bin/python -c 'import metachao'
-
 test-nose: bin/nosetests
 	rm -f .coverage
 	./bin/nosetests -w . --with-cov --cover-branches --cover-package=metachao
 
-check: check-imports test-nose
+check: test-nose
 
-.PHONY: all bootstrap print-syspath check check-imports test-nose
+.PHONY: all bootstrap print-syspath check test-nose
