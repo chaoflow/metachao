@@ -1,12 +1,8 @@
-Build test runner::
+Bootstrap (needs $NIX_PATH to be set)
 
-    $ python bootstrap.py
-    $ ./bin/buildout
+    % make bootstrap
 
 Run tests and coverage::
 
-    $ ./bin/ztest
-    $ ./bin/zcoverage
+    $ make check
 
-There are several other test runners built, but so far the zope
-testrunner is most satisfying.
