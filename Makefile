@@ -18,6 +18,7 @@ check-imports:
 	./bin/python -c 'import metachao'
 
 test-nose: bin/nosetests
+	rm .coverage
 	./bin/nosetests -w . --with-cov --cover-branches --cover-package=metachao
 
 check: check-imports test-nose
