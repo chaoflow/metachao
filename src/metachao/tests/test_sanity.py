@@ -17,7 +17,7 @@ class Sanity(TestCase):
 
         C1 = a(B)
         c1 = C1()
-        
+
         @a
         class C2(B):
             pass
