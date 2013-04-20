@@ -1,10 +1,15 @@
+from __future__ import absolute_import
+
 from UserDict import UserDict
-from unittest import TestCase
 
-from metachao import aspect
-from metachao.prototype import derive
+from .compat import unittest
 
-class TestPrototype(TestCase):
+from .. import aspect
+from ..aspect import Aspect
+from ..prototype import derive
+
+
+class TestPrototype(unittest.TestCase):
     def setUp(self):
         class Klass(object):
             def ret_x(self):

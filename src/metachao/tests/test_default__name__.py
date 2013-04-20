@@ -1,10 +1,12 @@
-from unittest import TestCase
+from __future__ import absolute_import
+
+from .compat import unittest
 
 from metachao import aspect
 from metachao.aspect import Aspect
 
 
-class DefaultWith__name__(TestCase):
+class DefaultWith__name__(unittest.TestCase):
     def runTest(self):
         class C(object):
             pass

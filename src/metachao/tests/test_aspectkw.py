@@ -1,10 +1,12 @@
-from unittest import TestCase
+from __future__ import absolute_import
+
+from .compat import unittest
 
 from metachao import aspect
 from metachao.aspect import Aspect
 
 
-class Cfg(TestCase):
+class Cfg(unittest.TestCase):
     def runTest(self):
         class asp(Aspect):
             _a = aspect.cfg(1)

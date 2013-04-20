@@ -1,6 +1,10 @@
-import unittest
+from __future__ import absolute_import
+
 import doctest
 from pprint import pprint
+
+from .compat import unittest
+
 
 optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \

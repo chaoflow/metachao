@@ -1,10 +1,12 @@
-from unittest import TestCase
+from __future__ import absolute_import
+
+from .compat import unittest
 
 from metachao import aspect
 from metachao.aspect import Aspect
 
 
-class Compositions(TestCase):
+class Compositions(unittest.TestCase):
     def runTest(self):
         class a1(Aspect):
             a = 1

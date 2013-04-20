@@ -1,9 +1,11 @@
-from unittest import TestCase
+from __future__ import absolute_import
 
-from metachao._instructions import Instruction
+from .compat import unittest
+
+from .._instructions import Instruction
 
 
-class InstrRepr(TestCase):
+class InstrRepr(unittest.TestCase):
     def runTest(self):
         i = Instruction(None, name='NAME')
         self.assertEqual(i.name, 'NAME')

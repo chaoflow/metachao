@@ -1,10 +1,12 @@
-from unittest import TestCase
+from __future__ import absolute_import
 
-from metachao import aspect
-from metachao.aspect import Aspect
+from .compat import unittest
+
+from .. import aspect
+from ..aspect import Aspect
 
 
-class Sanity(TestCase):
+class Sanity(unittest.TestCase):
     def runTest(self):
         self.issubclass_and_isinstance()
 
