@@ -1,16 +1,41 @@
 from __future__ import absolute_import
 
+import inspect
+
 from .compat import unittest
 
 from .. import aspect
 from ..aspect import Aspect
 
-
 class Sanity(unittest.TestCase):
-    def runTest(self):
-        self.issubclass_and_isinstance()
+    def test_isclass(self):
+        class A(object):
+            pass
 
-    def issubclass_and_isinstance(self):
+        self.assertTrue(inspect.isclass(A))
+        self.assertFalse(inspect.isclass(A()))
+
+    def test_isclass_with_erronous_getattr(self):
+        class A(object):
+            def __getattr__(self, name):
+                """A getattr that does not raise AttributeError, ever.
+                """
+
+        self.assertTrue(inspect.isclass(A))
+        # ATTENTION: inspect.isclass fails if __getattr__ is broken
+        self.assertTrue(inspect.isclass(A()))
+
+    def test_isclass_with_getattr(self):
+        class A(object):
+            def __getattr__(self, name):
+                """A getattr that does not raise AttributeError, ever.
+                """
+                raise AttributeError
+
+        self.assertTrue(inspect.isclass(A))
+        self.assertFalse(inspect.isclass(A()))
+
+    def test_issubclass_and_isinstance(self):
         class B(object):
             pass
 
