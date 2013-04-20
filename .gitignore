@@ -1,4 +1,6 @@
+*~
 *,cover
+*.egg-info
 *.pyc
 /.*.cfg
 /.coverage
@@ -19,4 +21,6 @@
 /lib
 /man
 /nixenv
+/nixprofile*
 /parts
+/var

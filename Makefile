@@ -1,22 +1,53 @@
-all: check
+LOCALISED_SCRIPTS = ipython ipdb flake8 pylint nose
+PROJECT = $(shell basename $(shell pwd))
 
-bootstrap: dev.nix requirements.txt setup.py
-	nix-build --out-link nixenv dev.nix
-	./nixenv/bin/virtualenv --distribute --clear .
-	echo ../../../nixenv/lib/python2.7/site-packages > lib/python2.7/site-packages/nixenv.pth
-	./bin/pip install -r requirements.txt --no-index -f ""
-	./bin/easy_install -H "" metachao[test]
+PYTHON_VERSION = 2.6
+NIX_PROFILE = ./nixprofile${PYTHON_VERSION}
+NIX_SITE = ${NIX_PROFILE}/lib/python${PYTHON_VERSION}/site-packages
+VENV_CMD = ${NIX_PROFILE}/bin/virtualenv
+VENV = .
+VENV_SITE = ${VENV}/lib/python${PYTHON_VERSION}/site-packages
+NOSETESTS = SLAPD=${SLAPD} ${VENV}/bin/nosetests
 
-bin/nosetests:
-	./bin/easy_install -H "" nose
+
+all: print-python-version test-import check
+
+bootstrap:
+	nix-env -p ${NIX_PROFILE} -i dev-env -f dev${PYTHON_VERSION}.nix
+	${VENV_CMD} --distribute --clear .
+	realpath --no-symlinks --relative-to ${VENV_SITE} ${NIX_SITE} > ${VENV_SITE}/nixprofile.pth
+	${VENV}/bin/pip install -r requirements.txt --no-index -f ""
+	for script in ${LOCALISED_SCRIPTS}; do ${VENV}/bin/easy_install -H "" $$script; done
 
 print-syspath:
-	./bin/python -c 'import sys,pprint;pprint.pprint(sys.path)'
+	${VENV}/bin/python -c 'import sys,pprint;pprint.pprint(sys.path)'
 
-test-nose: bin/nosetests
+print-python-version:
+	${VENV}/bin/python -c 'import sys; print sys.version'
+
+test-import:
+	${VENV}/bin/python -c "import ${PROJECT}; print ${PROJECT}"
+
+var:
+	test -L var -a ! -e var && rm var || true
+	ln -s $(shell mktemp --tmpdir -d ${PROJECT}-var-XXXXXXXXXX) var
+
+var-clean:
+	rm -fR var/*
+
+check: var var-clean
+	${NOSETESTS} -v -w . --processes=4 ${ARGS}
+
+check-debug: var var-clean
+	DEBUG=1 ${NOSETESTS} -v -w . --ipdb --ipdb-failures ${ARGS}
+
+coverage: var var-clean
 	rm -f .coverage
-	./bin/nosetests -w . --with-cov --cover-branches --cover-package=metachao
+	${NOSETESTS} -v -w . --with-cov --cover-branches --cover-package=${PROJECT} ${ARGS}
 
-check: test-nose
 
-.PHONY: all bootstrap print-syspath check test-nose
+pyoc-clean:
+	find . -name '*.py[oc]' -print0 |xargs -0 rm
+
+
+.PHONY: all bootstrap check coverage print-syspath pyoc-clean test-nose var var-clean
