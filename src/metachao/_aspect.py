@@ -97,7 +97,7 @@ class Workbench(object):
             # bound methods found on origin, except if blacklisted
             blacklist = (
                 '__class__', '__delattr__', '__doc__', '__format__',
-                '__getattr__', '__getattribute__', '__hash__',
+                '__getattribute__', '__hash__',
                 '__init__', '__metachao_origin__',
                 '__metachao_prototype__', '__new__', '__reduce__',
                 '__reduce_ex__', '__repr__', '__setattr__',
@@ -120,7 +120,7 @@ class Workbench(object):
             self.dct['__init__'] = lambda *a, **kw : None
             self.dct['__metachao_prototype__'] = origin
 
-        if getattr(origin, '__metachao_effective__', None) is not None:
+        if '__metachoa_effective__' in origin.__dict__:
             self.dct['__metachao_effective__'] = \
                 origin.__metachao_effective__.copy()
 
