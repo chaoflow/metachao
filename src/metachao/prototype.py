@@ -6,15 +6,18 @@ def derive(prototype, bind=dict()):
         def __init__(self, *args, **kw):
             prototype.__class__.__init__(self, *args, **kw)
             self.__metachao_prototype__ = prototype
-            self.__metachao_bind__ = dict(getattr(prototype, '__metachao_bind__', ()))
+            self.__metachao_bind__ = dict(getattr(prototype,
+                                                  '__metachao_bind__',
+                                                  ()))
             self.__metachao_bind__.update(bind)
 
         def __getattribute__(self, name):
             """realize prototyping chain
 
             1. instance dictionary
-            2. for callables/properties check instance's class (the ad-hoc Prototyper)
-            3. prototype getattr
+            2. for callables/properties check instance's class
+               (the ad-hoc Prototyper)
+            3. get attribute from prototype
             """
             # shortcut for things we don't want to go into the prototype chain
             if name in (

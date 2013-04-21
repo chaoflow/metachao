@@ -202,7 +202,8 @@ class AspectMeta(ABCMeta):
         ...     a = Instruction(1)
         ...     b = 2
         >>> Instructions(P)
-        [('a', <class 'metachao._instructions.Instruction'>, 1), ('b', <class 'metachao._instructions.overwrite'>, 2)]
+        [('a', <class 'metachao._instructions.Instruction'>, 1),
+         ('b', <class 'metachao._instructions.overwrite'>, 2)]
         """
         super(AspectMeta, aspect).__init__(name, bases, dct)
 
@@ -238,7 +239,8 @@ class AspectMeta(ABCMeta):
                 instructions.append(item)
 
         # for (every) aspectkw we need to plumb __init__
-        aspectkws = dict([(x.key, x) for x in instructions if isinstance(x, aspectkw)])
+        aspectkws = dict([(x.key, x) for x in instructions
+                          if isinstance(x, aspectkw)])
         if aspectkws:
             @plumb
             def __init__(_next, self, *args, **kw):

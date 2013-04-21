@@ -6,7 +6,7 @@ from .. import aspect
 from ..aspect import Aspect
 
 
-class AspectInheritance(unittest.TestCase):
+class Getattr(unittest.TestCase):
     def test_origin_getattr(self):
         class A(object):
             def __getattr__(self, name):
