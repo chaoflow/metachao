@@ -129,7 +129,7 @@ class Workbench(object):
 class AspectMeta(ABCMeta):
     """meta class for aspects
     """
-    def __call__(aspect, origin=None, *args, **kw):
+    def __call__(aspect, origin=None, **kw):
         if kw.get('pdb'):
             import pdb;pdb.set_trace()
         elif kw.get('ipdb'):
