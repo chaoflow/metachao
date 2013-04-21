@@ -1,5 +1,5 @@
 from abc import ABCMeta
-from inspect import getmembers, getmro, isclass
+from inspect import getmembers, getmro
 
 try:
     from zope.interface import classImplements
@@ -14,6 +14,7 @@ from metachao._instructions import overwrite
 from metachao._instructions import plumb
 from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
+from metachao import utils
 
 
 DICT_KEYS_OF_PLAIN_CLASS = ['__dict__', '__doc__', '__module__', '__weakref__']
@@ -76,7 +77,7 @@ class Workbench(object):
         self.origin = origin
         self.kw = kw
         self.dct = dict()
-        if isclass(origin):
+        if utils.isclass(origin):
             # Aspect application does not change the name. This can
             # lead to messages like "... expects a.A not a.A".
             self.name = origin.__name__
@@ -183,7 +184,7 @@ class AspectMeta(ABCMeta):
         type(aspect).register(aspect, cls)
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
-        if isclass(origin):
+        if utils.isclass(origin):
             if type(cls) is AspectMeta and kw:
                 raise OldCodePath
                 return Partial(cls, **kw)
