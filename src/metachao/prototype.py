@@ -2,6 +2,12 @@ from inspect import getmembers
 
 
 def derive(prototype, bind=dict()):
+    Prototyper = prototyper(prototype, bind=bind)
+    derived = Prototyper()
+    return derived
+
+
+def prototyper(prototype, bind=dict()):
     class Prototyper(prototype.__class__, object):
         def __init__(self, *args, **kw):
             prototype.__class__.__init__(self, *args, **kw)
@@ -56,8 +62,8 @@ def derive(prototype, bind=dict()):
 
             return attr
 
-    derived = Prototyper()
-    return derived
+    return Prototyper
+
 
 
 # XXX: I don't think this will be needed anymore
