@@ -132,6 +132,8 @@ class AspectMeta(ABCMeta):
     def __call__(aspect, origin=None, *args, **kw):
         if kw.get('pdb'):
             import pdb;pdb.set_trace()
+        elif kw.get('ipdb'):
+            import ipdb;ipdb.set_trace()
 
         # if called without positional arg, return partially applied
         # aspect
