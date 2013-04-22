@@ -91,7 +91,7 @@ class Workbench(object):
         else:
             # we are pretty much creating an object that uses origin
             # as prototype.
-            self.name = "Prototyper"
+            self.name = "Prototyper:%s" % (origin.__class__.__name__,)
             self.baseclasses = ()
             self.type = type
 
@@ -181,8 +181,8 @@ class AspectMeta(ABCMeta):
 
         # build a new class, with the same name and bases as the
         # target class, but a new dictionary with the aspect applied.
-        cls = workbench.type(workbench.name, workbench.baseclasses,
-                             workbench.dct)
+        name = '%s:%s' % (aspect.__name__, workbench.name)
+        cls = workbench.type(name, workbench.baseclasses, workbench.dct)
         type(aspect).register(aspect, cls)
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
