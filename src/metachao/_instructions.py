@@ -172,7 +172,7 @@ class plumb(Instruction):
         payload = self.payload
         name = self.name
         _next_method = getattr(workbench.origin, self.name)
-        if type(workbench.origin) is type:
+        if utils.isclass(workbench.origin):
             @wraps(payload)
             def wrapper(self, *args, **kw):
                 __traceback_info__ = name
