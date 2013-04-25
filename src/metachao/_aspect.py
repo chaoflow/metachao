@@ -149,7 +149,7 @@ class AspectMeta(ABCMeta):
         if type(origin) is AspectMeta:
             if kw:
                 raise Unsupported("kw and composition not supported")
-            name = "AspectComposition"
+            name = ":".join([aspect.__name__, origin.__name__])
             aspects = []
             for asp in (aspect, origin):
                 if hasattr(asp, '__metachao_compose__'):
