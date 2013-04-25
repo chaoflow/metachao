@@ -8,6 +8,7 @@ try:
 except ImportError:                   #pragma NO COVERAGE
     ZOPE_INTERFACE_AVAILABLE = False  #pragma NO COVERAGE
 
+
 from metachao._instructions import Instruction
 from metachao._instructions import aspectkw
 from metachao._instructions import overwrite
@@ -121,7 +122,7 @@ class Workbench(object):
             self.dct['__init__'] = lambda *a, **kw : None
             self.dct['__metachao_prototype__'] = origin
 
-        if '__metachoa_effective__' in origin.__dict__:
+        if '__metachao_effective__' in origin.__dict__:
             self.dct['__metachao_effective__'] = \
                 origin.__metachao_effective__.copy()
 
