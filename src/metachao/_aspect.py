@@ -149,7 +149,7 @@ class AspectMeta(ABCMeta):
         if type(origin) is AspectMeta:
             if kw:
                 raise Unsupported("kw and composition not supported")
-            name = ":".join([aspect.__name__, origin.__name__])
+            name = "AspectComposition"
             aspects = []
             for asp in (aspect, origin):
                 if hasattr(asp, '__metachao_compose__'):
@@ -182,7 +182,10 @@ class AspectMeta(ABCMeta):
 
         # build a new class, with the same name and bases as the
         # target class, but a new dictionary with the aspect applied.
-        name = '%s:%s' % (aspect.__name__, workbench.name)
+        # XXX: name is lenght limited... hackup traceback or something
+        # to generate more useful info
+        #name = '%s:%s' % (aspect.__name__, workbench.name)
+        name = workbench.name
         cls = workbench.type(name, workbench.baseclasses, workbench.dct)
         type(aspect).register(aspect, cls)
         if ZOPE_INTERFACE_AVAILABLE:
