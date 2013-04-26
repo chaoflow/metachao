@@ -35,4 +35,5 @@ class Compositions(unittest.TestCase):
             pass
 
         composition = compose(a1, a2, a3)
-        self.assertEqual(composition.__name__, 'a1:a2:a3')
+        #self.assertEqual(composition.__name__, 'a1:a2:a3')
+        self.assertEqual(composition.__name__, 'AspectComposition')
