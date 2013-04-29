@@ -127,10 +127,14 @@ class Workbench(object):
                 origin.__metachao_effective__.copy()
 
 
+class _UNSET(object):
+    pass
+
+
 class AspectMeta(ABCMeta):
     """meta class for aspects
     """
-    def __call__(aspect, origin=None, **kw):
+    def __call__(aspect, origin=_UNSET, **kw):
         if kw.get('pdb'):
             import pdb;pdb.set_trace()
         elif kw.get('ipdb'):
@@ -138,12 +142,16 @@ class AspectMeta(ABCMeta):
 
         # if called without positional arg, return partially applied
         # aspect
-        if origin is None:
+        if origin is _UNSET:
             if not kw:
                 raise NeedKw
             # XXX: this does not play nice with ABC
             # XXX: return an aspect that is differently configured
             return Partial(aspect, **kw)
+
+        if origin is None:
+            raise ValueError(
+                "Need aspect, class, or instance, not %r!" % (origin,))
 
         # if called with another aspect compose them
         if type(origin) is AspectMeta:
