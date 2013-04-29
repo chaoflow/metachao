@@ -1,10 +1,8 @@
 import logging
 import utils
 
-from functools import wraps
 from inspect import getmembers
 from inspect import getmro
-from inspect import isclass
 
 from metachao.tools import partial
 
@@ -168,6 +166,18 @@ class AllNext(object):
         return attr
 
 
+class wraps(object):
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+
+    def __call__(self, wrapper):
+        wrapped = self.wrapped
+        wrapper.__doc__ = wrapped.__doc__
+        wrapper.__module__ = getattr(wrapped, '__module__', 'probably_builtin')
+        wrapper.__name__ = wrapped.__name__
+        return wrapper
+
+
 class plumb(Instruction):
     def apply(self, workbench, effective):
         payload = self.payload
@@ -177,6 +187,7 @@ class plumb(Instruction):
             @wraps(payload)
             def wrapper(self, *args, **kw):
                 __traceback_info__ = name
+                @wraps(_next_method)
                 def _next(*args, **kw):
                     return _next_method(self, *args, **kw)
                 # All _next methods, not just for the current name,
@@ -187,6 +198,7 @@ class plumb(Instruction):
             @wraps(payload)
             def wrapper(self, *args, **kw):
                 __traceback_info__ = name
+                @wraps(_next_method)
                 def _next(*args, **kw):
                     return _next_method(*args, **kw)
                 # All _next methods, not just for the current name,
