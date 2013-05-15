@@ -77,7 +77,9 @@ class Workbench(object):
     def __init__(self, origin, **kw):
         self.origin = origin
         self.kw = kw
-        self.dct = dict()
+        self.dct = dict(
+            __metachao_aspects__=getattr(origin, '__metachao_aspects__', [])[:]
+        )
         if utils.isclass(origin):
             # Aspect application does not change the name. This can
             # lead to messages like "... expects a.A not a.A".
@@ -194,6 +196,7 @@ class AspectMeta(ABCMeta):
         # to generate more useful info
         #name = '%s:%s' % (aspect.__name__, workbench.name)
         name = workbench.name
+        workbench.dct['__metachao_aspects__'].insert(0, aspect)
         cls = workbench.type(name, workbench.baseclasses, workbench.dct)
         type(aspect).register(aspect, cls)
         if ZOPE_INTERFACE_AVAILABLE:
