@@ -231,6 +231,8 @@ We would save the getmembers calls in _aspect.py
             else:
                 _next_method = self._wrap_instance(workbench.origin,
                                                    fn, _next_method)
+                _next_method = _next_method.__get__(workbench.origin,
+                                                    workbench.origin.__class__)
 
         # set wrapper
         workbench.dct[self.name] = _next_method
