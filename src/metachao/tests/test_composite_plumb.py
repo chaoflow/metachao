@@ -13,7 +13,7 @@ def f2(_next, self):
 
 
 class a(aspect.Aspect):
-    f = aspect.composite_plumb([f1, f2])
+    f = aspect.plumb([f1, f2])
 
 
 @a
