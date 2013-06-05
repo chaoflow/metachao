@@ -223,6 +223,9 @@ We would save the getmembers calls in _aspect.py
     """
     def apply(self, workbench, effective):
         function_list = self.payload
+        return self._apply(function_list, workbench, effective)
+
+    def _apply(self, function_list, workbench, effective):
         _next_method = getattr(workbench.origin, self.name)
         _next_method = _next_method.im_func
         for fn in reversed(function_list):
