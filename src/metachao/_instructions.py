@@ -11,14 +11,8 @@ log = logging.getLogger('metachao')
 
 
 class Instruction(object):
-    __name__ = None
-    __parent__ = None
-
-    @property
-    def name(self):
-        """Name of the attribute the instruction is for
-        """
-        return self.__name__
+    name = None
+    parent = None
 
     @property
     def payload(self):

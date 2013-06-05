@@ -21,58 +21,6 @@ from metachao import utils
 DICT_KEYS_OF_PLAIN_CLASS = ['__dict__', '__doc__', '__module__', '__weakref__']
 
 
-# XXX: derive from list/UserList and store self on aspect?
-class Instructions(object):
-    """Adapter to store instructions on a aspect
-
-    >>> class P(object): pass
-    >>> instrs = Instructions(P)
-    >>> instrs.append(1)
-    >>> instrs.instructions
-    [1]
-    >>> instrs = Instructions(P)
-    >>> instrs.instructions
-    [1]
-    """
-    attrname = "__metachao_instructions__"
-
-    @property
-    def instructions(self):
-        return getattr(self.aspect, self.attrname)
-
-    def __call__(self, workbench):
-        if type(workbench.origin) is AspectMeta:
-            raise Error
-            curinstr = workbench.dct[self.attrname]
-            workbench.dct[self.attrname] = curinstr + self.instructions
-        else:
-            for instr in self.instructions:
-                instr(workbench)
-
-    def __contains__(self, name):
-        for x in self:
-            if x.name == name:
-                return True
-        else:
-            return False
-
-    def __getattr__(self, name):
-        return getattr(self.instructions, name)
-
-    def __iter__(self):
-        return self.instructions.__iter__()
-
-    def __init__(self, aspect):
-        self.aspect = aspect
-        if self.attrname not in aspect.__dict__:
-            setattr(aspect, self.attrname, [])
-
-    def __repr__(self):
-        return repr(
-            [(x.name, x.__class__, x.payload) for x in self.instructions]
-            )
-
-
 class Workbench(object):
     def __init__(self, origin, **kw):
         self.origin = origin
@@ -181,8 +129,8 @@ class AspectMeta(ABCMeta):
 
         # a single aspects called on a normal class or an instance
         workbench = Workbench(origin, **kw)
-        instrs = Instructions(aspect)
-        instrs(workbench)
+        for instruction in aspect.__metachao_instructions__.values():
+            instruction(workbench)
 
             #raise AspectCollision(instr.name, aspect, target)
 
@@ -225,7 +173,7 @@ class AspectMeta(ABCMeta):
         super(AspectMeta, aspect).__init__(name, bases, dct)
 
         # Get the aspect's instructions list
-        instructions = Instructions(aspect)
+        instructions = aspect.__metachao_instructions__ = dict()
 
         # walk the mro, w/o object, gathering/creating instructions
         # XXX: not sure whether that is good
@@ -247,16 +195,18 @@ class AspectMeta(ABCMeta):
                 if name in instructions:
                     continue
 
-                # XXX: rethink this
                 # undecorated items are understood as overwrite
-                if not isinstance(item, Instruction):
-                    item = overwrite(item)
-                item.__name__ = name
-                item.__parent__ = aspect
-                instructions.append(item)
+                if isinstance(item, Instruction):
+                    instruction = item
+                else:
+                    instruction = overwrite(item)
+
+                instruction.name = name
+                instruction.parent = cls
+                instructions[name] = instruction
 
         # for (every) aspectkw we need to plumb __init__
-        aspectkws = dict([(x.key, x) for x in instructions
+        aspectkws = dict([(x.key, x) for x in instructions.values()
                           if isinstance(x, aspectkw)])
         if aspectkws:
             @plumb
@@ -269,9 +219,9 @@ class AspectMeta(ABCMeta):
                     if value is not akw.item:
                         setattr(self, akw.name, value)
                 _next(*args, **kw)
-            __init__.__name__ = '__init__'
-            __init__.__parent__ = aspect
-            instructions.append(__init__)
+            __init__.name = '__init__'
+            __init__.parent = aspect
+            instructions['__init__'] = __init__
 
         # # An existing docstring is an implicit plumb instruction for __doc__
         # if aspect.__doc__ is not None:
