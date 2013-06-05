@@ -224,11 +224,10 @@ We would save the getmembers calls in _aspect.py
     def apply(self, workbench, effective):
         function_list = self.payload
         _next_method = getattr(workbench.origin, self.name)
-
         for fn in reversed(function_list):
             if utils.isclass(workbench.origin):
-                _next_method = self._wrap_class(workbench.origin, fn,
-                                                _next_method)
+                _next_method = self._wrap_class(workbench.origin,
+                                                fn, _next_method)
             else:
                 _next_method = self._wrap_instance(workbench.origin,
                                                    fn, _next_method)
@@ -255,5 +254,20 @@ We would save the getmembers calls in _aspect.py
 
         return wrapper
 
-    def _wrap_instance(self, origin, fn, _next):
-        pass
+    def _wrap_instance(self, origin, fn, _next_method):
+        attrname = self.name
+
+        @wraps(fn)
+        def wrapper(self, *args, **kw):
+            __traceback_info__ = attrname
+
+            @wraps(_next_method)
+            def _next(*args, **kw):
+                return _next_method(*args, **kw)
+
+            # All _next methods, not just for the current name,
+            # are available via _next.all
+            _next.all = AllNext(origin)
+            return fn(_next, self, *args, **kw)
+
+        return wrapper

@@ -13,7 +13,7 @@ def f2(_next, self):
 
 
 class a(aspect.Aspect):
-    f = aspect.composite_plumb(f1, f2)
+    f = aspect.composite_plumb([f1, f2])
 
 
 @a
@@ -23,6 +23,6 @@ class C(object):
 
 
 class TestCompositePlumb(unittest.TestCase):
-    def test(self):
+    def test_composite_plumb(self):
         c = C()
         self.assertEqual(c.f(), "f1-f2-f")
