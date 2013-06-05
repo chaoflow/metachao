@@ -81,6 +81,62 @@ class _UNSET(object):
     pass
 
 
+def instructions_from_aspect(aspect):
+    instructions = dict()
+
+    # walk the mro, w/o object, gathering/creating instructions
+    # XXX: not sure whether that is good
+    for cls in getmro(aspect)[:-1]:
+        for name, item in cls.__dict__.iteritems():
+            # ignored attributes
+            if name.startswith('_abc_'):
+                continue
+            if name == '__abstractmethods__':
+                continue
+            if name.startswith('__metachao_'):
+                continue
+            if name in (
+                    '__implemented__', '__metaclass__',
+                    '__provides__', '__providedBy__',
+            ):
+                continue
+            if name in DICT_KEYS_OF_PLAIN_CLASS:
+                continue
+            if name in instructions:
+                continue
+
+            # undecorated items are understood as overwrite
+            if isinstance(item, Instruction):
+                instruction = item
+            else:
+                instruction = overwrite(item)
+
+            instruction.name = name
+            instruction.parent = cls
+            instructions[name] = instruction
+
+    # for (every) aspectkw we need to plumb __init__
+    aspectkws = dict([(x.key, x) for x in instructions.values()
+                      if isinstance(x, aspectkw)])
+    if aspectkws:
+        @plumb
+        def __init__(_next, self, *args, **kw):
+            for k in kw.keys():
+                if k not in aspectkws:
+                    continue
+                value = kw.pop(k)
+                akw = aspectkws[k]
+                if value is not akw.item:
+                    setattr(self, akw.name, value)
+            _next(*args, **kw)
+
+        __init__.name = '__init__'
+        __init__.parent = aspect
+        instructions['__init__'] = __init__
+
+    return instructions
+
+
 class AspectMeta(ABCMeta):
     """meta class for aspects
     """
@@ -173,55 +229,7 @@ class AspectMeta(ABCMeta):
         super(AspectMeta, aspect).__init__(name, bases, dct)
 
         # Get the aspect's instructions list
-        instructions = aspect.__metachao_instructions__ = dict()
-
-        # walk the mro, w/o object, gathering/creating instructions
-        # XXX: not sure whether that is good
-        for cls in getmro(aspect)[:-1]:
-            for name, item in cls.__dict__.iteritems():
-                # ignored attributes
-                if name.startswith('_abc_'):
-                    continue
-                if name == '__abstractmethods__':
-                    continue
-                if name.startswith('__metachao_'):
-                    continue
-                if name in (
-                    '__implemented__', '__metaclass__',
-                    '__provides__', '__providedBy__',
-                    ): continue
-                if name in DICT_KEYS_OF_PLAIN_CLASS:
-                    continue
-                if name in instructions:
-                    continue
-
-                # undecorated items are understood as overwrite
-                if isinstance(item, Instruction):
-                    instruction = item
-                else:
-                    instruction = overwrite(item)
-
-                instruction.name = name
-                instruction.parent = cls
-                instructions[name] = instruction
-
-        # for (every) aspectkw we need to plumb __init__
-        aspectkws = dict([(x.key, x) for x in instructions.values()
-                          if isinstance(x, aspectkw)])
-        if aspectkws:
-            @plumb
-            def __init__(_next, self, *args, **kw):
-                for k in kw.keys():
-                    if k not in aspectkws:
-                        continue
-                    value = kw.pop(k)
-                    akw = aspectkws[k]
-                    if value is not akw.item:
-                        setattr(self, akw.name, value)
-                _next(*args, **kw)
-            __init__.name = '__init__'
-            __init__.parent = aspect
-            instructions['__init__'] = __init__
+        aspect.__metachao_instructions__ = instructions_from_aspect(aspect)
 
         # # An existing docstring is an implicit plumb instruction for __doc__
         # if aspect.__doc__ is not None:
