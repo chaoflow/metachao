@@ -209,3 +209,51 @@ class plumb(Instruction):
         # set wrapper
         workbench.dct[self.name] = wrapper
         return True
+
+
+class composite_plumb(Instruction):
+    """
+    like plumb decorator but receives a list of function that accept _next
+as their first argument
+
+When applied, the list of functions is applied in reverse order.
+
+We would save the getmembers calls in _aspect.py
+
+    """
+    def apply(self, workbench, effective):
+        function_list = self.payload
+        _next_method = getattr(workbench.origin, self.name)
+
+        for fn in reversed(function_list):
+            if utils.isclass(workbench.origin):
+                _next_method = self._wrap_class(workbench.origin, fn,
+                                                _next_method)
+            else:
+                _next_method = self._wrap_instance(workbench.origin,
+                                                   fn, _next_method)
+
+        # set wrapper
+        workbench.dct[self.name] = _next_method
+        return True
+
+    def _wrap_class(self, origin, fn, _next_method):
+        attrname = self.name
+
+        @wraps(fn)
+        def wrapper(self, *args, **kw):
+            __traceback_info__ = attrname
+
+            @wraps(_next_method)
+            def _next(*args, **kw):
+                return _next_method(self, *args, **kw)
+
+            # All _next methods, not just for the current name,
+            # are available via _next.all
+            _next.all = AllNext(origin, self)
+            return fn(_next, self, *args, **kw)
+
+        return wrapper
+
+    def _wrap_instance(self, origin, fn, _next):
+        pass

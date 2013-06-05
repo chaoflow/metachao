@@ -1,0 +1,100 @@
+* Notes
+** real compositions
+class a1(Aspect):
+    a = 1
+    b = default(1)
+    c = default(1)
+
+    def f(self):
+        return 1
+
+    @default
+    def g(self):
+        return 1
+
+    @default
+    def h(self):
+        return 1
+
+    @plumb
+    def x(_next, self):
+        return 3 * _next()
+
+
+class a2(Aspect):
+    a = 2
+    b = default(2)
+    c = default(2)
+
+    def f(self):
+        return 2
+
+    @default
+    def g(self):
+        return 2
+
+    @default
+    def h(self):
+        return 2
+
+    @plumb
+    def x(_next, self):
+        return 2 * _next()
+        
+
+class C(object):
+    c = 3
+
+    def h(self):
+        return 3
+
+    def x(self):
+        return 1
+
+
+a1a2 = a1(a2) = compose(a1, a2)
+
+a1a2(C).a -> 1
+a1a2(C).b -> 2
+a1a2(C).c -> 3
+a1a2(C).f() -> 1
+a1a2(C).g() -> 2
+a1a2(C).h() -> 3
+a1a2(C).x() -> 6
+
+
+
+composition:
+
+class a12(Aspect):
+    a = 1
+    b = default(2)
+    c = default(2)
+
+    def f(self):
+        return 1
+
+    def g(self):
+        return 2
+
+    def h(self):
+        return 3
+
+    x = plumbcomposition([a1.x, a2.x])
+
+
+a12(C).a -> 1
+a12(C).b -> 2
+a12(C).c -> 3
+a1a2(C).f() -> 1
+a1a2(C).g() -> 2
+a1a2(C).h() -> 3
+** composite_plumb
+like plumb decorator but receives a list of function that accept _next
+as their first argument
+
+When applied, the list of functions is applied in reverse order.
+
+We would save the getmembers calls in _aspect.py
+
+See also _instructions.plumb:181
