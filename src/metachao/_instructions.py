@@ -224,15 +224,16 @@ We would save the getmembers calls in _aspect.py
     def apply(self, workbench, effective):
         function_list = self.payload
         _next_method = getattr(workbench.origin, self.name)
+        _next_method = _next_method.im_func
         for fn in reversed(function_list):
             if utils.isclass(workbench.origin):
                 _next_method = self._wrap_class(workbench.origin,
                                                 fn, _next_method)
             else:
-                _next_method = self._wrap_instance(workbench.origin,
-                                                   fn, _next_method)
                 _next_method = _next_method.__get__(workbench.origin,
                                                     workbench.origin.__class__)
+                _next_method = self._wrap_instance(workbench.origin,
+                                                   fn, _next_method)
 
         # set wrapper
         workbench.dct[self.name] = _next_method
