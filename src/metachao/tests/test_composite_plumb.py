@@ -22,7 +22,15 @@ class C(object):
         return "f"
 
 
+class D(object):
+    def f(self):
+        return "g"
+
+
 class TestCompositePlumb(unittest.TestCase):
-    def test_composite_plumb(self):
+    def test_composite_plumb_class(self):
         c = C()
         self.assertEqual(c.f(), "f1-f2-f")
+
+    def test_composite_plumb_instance(self):
+        self.assertEqual(a(D()).f(), "f1-f2-g")
