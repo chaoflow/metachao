@@ -17,6 +17,7 @@ from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
 from metachao import utils
 
+from ._compose import compose
 from ._instructions import config as config_instruction
 
 
@@ -195,26 +196,9 @@ class AspectMeta(ABCMeta):
         # if called with another aspect compose them
         if type(origin) is AspectMeta:
             if kw:
+                # XXX: looks we could soon do this
                 raise Unsupported("kw and composition not supported")
-            name = "AspectComposition"
-            aspects = []
-            for asp in (aspect, origin):
-                if hasattr(asp, '__metachao_compose__'):
-                    aspects.extend(asp.__metachao_compose__)
-                else:
-                    aspects.append(asp)
-            composite = AspectMeta(name, (Aspect,), dict(__metachao_compose__=aspects))
-            #type(origin).register(origin, composite)
-            #type(aspect).register(aspect, composite)
-            return composite
-
-        # if composition, chain them
-        if hasattr(aspect, '__metachao_compose__'):
-            for asp in reversed(aspect.__metachao_compose__):
-                origin = asp(origin, **kw)
-            # if type(origin) is type:
-            #     type(aspect).register(aspect, origin)
-            return origin
+            return compose(aspect, origin)
 
         # a single aspects called on a normal class or an instance
         workbench = Workbench(origin)

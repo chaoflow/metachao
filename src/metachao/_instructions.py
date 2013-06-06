@@ -96,6 +96,12 @@ class EitherOrInstruction(Instruction):
     def value(self, workbench):
         return self.payload
 
+    def compose(self, other):
+        if isinstance(self, default):
+            return other
+        else:
+            return self
+
 
 class default(EitherOrInstruction):
     def check(self, workbench, effective):
@@ -196,6 +202,18 @@ class plumb(Instruction):
         # set wrapper
         workbench.dct[self.name] = _next_method
         return True
+
+    def compose(self, other):
+        if isinstance(other, plumb):
+            return plumb(self.function_list + other.function_list)
+        elif isinstance(other, overwrite):
+            return plumb(self.function_list + (other.payload,))
+        elif isinstance(other, default):
+            # XXX: sadtrombone - looks like we need to keep the info
+            # around that it is only default and once the composition
+            # is applied and there is already a function, we throw out
+            # the default and use the existing one instead
+            pass
 
     def _wrap_class(self, origin, fn, _next_method):
         attrname = self.name
