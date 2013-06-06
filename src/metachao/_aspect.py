@@ -86,6 +86,7 @@ def instructions_from_aspect(aspect):
 
     # walk the mro, w/o object, gathering/creating instructions
     # XXX: not sure whether that is good
+    # XXX: why doesn't getmembers do the job?
     for cls in getmro(aspect)[:-1]:
         for name, item in cls.__dict__.iteritems():
             # ignored attributes
@@ -233,21 +234,6 @@ class AspectMeta(ABCMeta):
         # # An existing docstring is an implicit plumb instruction for __doc__
         # if aspect.__doc__ is not None:
         #     instructions.append(plumb(aspect.__doc__, name='__doc__'))
-
-        # # XXX: introduce C3 resolution
-        # # check our bases for instructions we don't have already and which
-        # # are not overwritten by our instructions (stage1)
-        # for base in bases:
-        #     # XXX: I don't like this code
-        #     for instr in Instructions(base):
-        #         # skip instructions we have already
-        #         if instr in instructions:
-        #             continue
-        #         # stage1 instructions with the same name are ignored
-        #         if instr.__name__ in [x.__name__ for x in instructions if
-        #                 x.__stage__ == 'stage1']:
-        #             continue
-        #         instructions.append(instr)
 
 
 class Aspect(object):
