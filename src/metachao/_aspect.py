@@ -158,8 +158,8 @@ class AspectMeta(ABCMeta):
             return Partial(aspect, **kw)
 
         if origin is None:
-            raise ValueError(
-                "Need aspect, class, or instance, not %r!" % (origin,))
+            raise ValueError("Need aspect, class, or instance, not %r!"
+                             % (origin,))
 
         # if called with another aspect compose them
         if type(origin) is AspectMeta:
