@@ -141,10 +141,12 @@ class AspectMeta(ABCMeta):
     """meta class for aspects
     """
     def __call__(aspect, origin=_UNSET, **kw):
-        if kw.get('pdb'):
-            import pdb;pdb.set_trace()
-        elif kw.get('ipdb'):
-            import ipdb;ipdb.set_trace()
+        if kw.pop('pdb', None):
+            import pdb
+            pdb.set_trace()
+        elif kw.pop('ipdb', None):
+            import ipdb
+            ipdb.set_trace()
 
         # if called without positional arg, return partially applied
         # aspect
