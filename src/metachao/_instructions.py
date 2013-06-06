@@ -188,9 +188,29 @@ class plumb(Instruction):
         return tuple(function_list)
 
     def apply(self, workbench, effective):
-        _next_method = getattr(workbench.origin, self.name)
+        function_list = list(self.function_list)
+        if isinstance(function_list[-1], overwrite):
+            _next_method = function_list.pop().payload
+            if not utils.isclass(workbench.origin):
+                _next_method = _next_method.__get__(
+                    workbench.origin,
+                    workbench.origin.__class__
+                )
+        else:
+            try:
+                _next_method = getattr(workbench.origin, self.name)
+            except AttributeError:
+                if isinstance(function_list[-1], default):
+                    _next_method = function_list.pop().payload
+                    if not utils.isclass(workbench.origin):
+                        _next_method = _next_method.__get__(
+                            workbench.origin,
+                            workbench.origin.__class__
+                        )
+                else:
+                    raise
 
-        for fn in reversed(self.function_list):
+        for fn in reversed(function_list):
             if utils.isclass(workbench.origin):
                 _next_method = self._wrap_class(workbench.origin,
                                                 fn, _next_method)
@@ -209,14 +229,10 @@ class plumb(Instruction):
     def compose(self, other):
         if isinstance(other, plumb):
             return plumb(self.function_list + other.function_list)
-        elif isinstance(other, overwrite):
-            return plumb(self.function_list + (other.payload,))
-        elif isinstance(other, default):
-            # XXX: sadtrombone - looks like we need to keep the info
-            # around that it is only default and once the composition
-            # is applied and there is already a function, we throw out
-            # the default and use the existing one instead
-            pass
+        elif isinstance(other, (default, overwrite)):
+            return plumb(self.function_list + (other,))
+        else:
+            raise CantTouchThis
 
     def _wrap_class(self, origin, fn, _next_method):
         attrname = self.name
