@@ -8,7 +8,7 @@ from metachao.aspect import compose
 
 
 class Compositions(unittest.TestCase):
-    def test(self):
+    def test_compositions(self):
         class a1(Aspect):
             a = 1
             b = aspect.default(1)
@@ -35,5 +35,6 @@ class Compositions(unittest.TestCase):
             pass
 
         composition = compose(a1, a2, a3)
+
         #self.assertEqual(composition.__name__, 'a1:a2:a3')
         self.assertEqual(composition.__name__, 'AspectComposition')
