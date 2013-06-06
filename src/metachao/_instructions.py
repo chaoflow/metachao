@@ -171,14 +171,17 @@ class wraps(object):
 
 
 class plumb(Instruction):
-    def apply(self, workbench, effective):
+    @property
+    def function_list(self):
         function_list = self.payload
         if not type(function_list) in (tuple, list):
             function_list = (function_list,)
+        return function_list
 
+    def apply(self, workbench, effective):
         _next_method = getattr(workbench.origin, self.name)
 
-        for fn in reversed(function_list):
+        for fn in reversed(self.function_list):
             if utils.isclass(workbench.origin):
                 _next_method = self._wrap_class(workbench.origin,
                                                 fn, _next_method)
