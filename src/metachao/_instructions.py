@@ -97,6 +97,9 @@ class EitherOrInstruction(Instruction):
         return self.payload
 
     def compose(self, other):
+        # XXX: we probably should log warning when overwriting a
+        # plumbing - unlikely that somebody constructs a plumbing and
+        # then overwrites it
         if isinstance(self, default):
             return other
         else:
@@ -182,7 +185,7 @@ class plumb(Instruction):
         function_list = self.payload
         if not type(function_list) in (tuple, list):
             function_list = (function_list,)
-        return function_list
+        return tuple(function_list)
 
     def apply(self, workbench, effective):
         _next_method = getattr(workbench.origin, self.name)
