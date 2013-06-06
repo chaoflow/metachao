@@ -17,14 +17,23 @@ from metachao.prototype import prototype_property
 from metachao.tools import Bases, Partial, boundproperty
 from metachao import utils
 
+from ._instructions import config as config_instruction
+
 
 DICT_KEYS_OF_PLAIN_CLASS = ['__dict__', '__doc__', '__module__', '__weakref__']
 
 
+class ConfigError(Exception):
+    pass
+
+
+class UnknownConfigKeys(ConfigError, KeyError):
+    pass
+
+
 class Workbench(object):
-    def __init__(self, origin, **kw):
+    def __init__(self, origin):
         self.origin = origin
-        self.kw = kw
         self.dct = dict(
             __metachao_aspects__=getattr(origin, '__metachao_aspects__', [])[:]
         )
@@ -81,8 +90,10 @@ class _UNSET(object):
     pass
 
 
-def instructions_from_aspect(aspect):
+def parse_aspect(aspect):
+    config = dict()
     instructions = dict()
+    seen = list()
 
     # walk the mro, w/o object, gathering/creating instructions
     # XXX: not sure whether that is good
@@ -103,8 +114,10 @@ def instructions_from_aspect(aspect):
                 continue
             if name in DICT_KEYS_OF_PLAIN_CLASS:
                 continue
-            if name in instructions:
+
+            if name in seen:
                 continue
+            seen.append(name)
 
             # undecorated items are understood as overwrite
             if isinstance(item, Instruction):
@@ -116,9 +129,10 @@ def instructions_from_aspect(aspect):
             instruction.parent = cls
             instructions[name] = instruction
 
-    # for (every) aspectkw we need to plumb __init__
-    aspectkws = dict([(x.key, x) for x in instructions.values()
-                      if isinstance(x, aspectkw)])
+            if isinstance(instruction, config_instruction):
+                config[instruction.key] = instruction
+
+    aspectkws = config
     if aspectkws:
         @plumb
         def __init__(_next, self, *args, **kw):
@@ -135,7 +149,26 @@ def instructions_from_aspect(aspect):
         __init__.parent = aspect
         instructions['__init__'] = __init__
 
-    return instructions
+    return (config, instructions)
+
+
+def configured_aspect(aspect, cfg):
+    unknown = set(cfg.keys()) - set(aspect.__metachao_config__.keys())
+    if unknown:
+        raise UnknownConfigKeys(tuple(unknown))
+
+    name = aspect.__name__ + "_configured"
+    bases = (aspect,)
+    dct = dict()
+
+    for k, v in cfg.items():
+        instr = config_instruction(v)
+        instr._key = k
+        instr.name = aspect.__metachao_config__[k].name
+        dct[instr.name] = instr
+
+    configured = aspect.__class__(name, bases, dct)
+    return configured
 
 
 class AspectMeta(ABCMeta):
@@ -149,14 +182,11 @@ class AspectMeta(ABCMeta):
             import ipdb
             ipdb.set_trace()
 
-        # if called without positional arg, return partially applied
-        # aspect
+        if kw:
+            aspect = configured_aspect(aspect, kw)
+
         if origin is _UNSET:
-            if not kw:
-                raise NeedKw
-            # XXX: this does not play nice with ABC
-            # XXX: return an aspect that is differently configured
-            return Partial(aspect, **kw)
+            return aspect
 
         if origin is None:
             raise ValueError("Need aspect, class, or instance, not %r!"
@@ -187,7 +217,7 @@ class AspectMeta(ABCMeta):
             return origin
 
         # a single aspects called on a normal class or an instance
-        workbench = Workbench(origin, **kw)
+        workbench = Workbench(origin)
         for instruction in aspect.__metachao_instructions__.values():
             instruction(workbench)
 
@@ -228,8 +258,9 @@ class AspectMeta(ABCMeta):
         """
         super(AspectMeta, aspect).__init__(name, bases, dct)
 
-        # Get the aspect's instructions list
-        aspect.__metachao_instructions__ = instructions_from_aspect(aspect)
+        # Get the aspect's config and instructions
+        (aspect.__metachao_config__,
+         aspect.__metachao_instructions__) = parse_aspect(aspect)
 
         # # An existing docstring is an implicit plumb instruction for __doc__
         # if aspect.__doc__ is not None:

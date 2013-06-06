@@ -106,6 +106,7 @@ class default(EitherOrInstruction):
             return True
 
 
+# XXX: should probably be inheriting from overwrite
 class aspectkw(default):
     """define a kw for the aspect
     """
@@ -125,11 +126,8 @@ class aspectkw(default):
         else:
             self.item = args[0]
 
-    def value(self, workbench):
-        if self.key in workbench.kw:
-            return workbench.kw[self.key]
-        return self.payload
 cfg = aspectkw
+config = cfg
 
 
 class overwrite(EitherOrInstruction):
