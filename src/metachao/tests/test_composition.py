@@ -3,38 +3,93 @@ from __future__ import absolute_import
 from .compat import unittest
 
 from metachao import aspect
-from metachao.aspect import Aspect
-from metachao.aspect import compose
 
 
-class Compositions(unittest.TestCase):
-    def test_compositions(self):
-        class a1(Aspect):
-            a = 1
-            b = aspect.default(1)
-            c = aspect.default(1)
-            d = aspect.default(1)
-            e = aspect.default(1)
-        class a2(Aspect):
-            a = 2
-            b = 2
-            c = aspect.default(2)
-            d = aspect.default(2)
-        class a3(Aspect):
-            a = 3
-            b = 3
-            c = 3
+class default1(aspect.Aspect):
+    def f(self):
+        return "default1"
 
-        a123 = a1(a2(a3))
-        a12 = a1(a2)
-        a12_3 = a12(a3)
-        a23 = a2(a3)
-        a1_23 = a1(a23)
 
-        class C(object):
-            pass
+class default2(aspect.Aspect):
+    def f(self):
+        return "default2"
 
-        composition = compose(a1, a2, a3)
 
-        #self.assertEqual(composition.__name__, 'a1:a2:a3')
-        self.assertEqual(composition.__name__, 'AspectComposition')
+class overwrite1(aspect.Aspect):
+    def f(self):
+        return "overwrite1"
+
+
+class overwrite2(aspect.Aspect):
+    def f(self):
+        return "overwrite2"
+
+
+class plumb(aspect.Aspect):
+    @aspect.plumb
+    def f(_next, self):
+        return "plumb-" + _next()
+
+
+class C(object):
+    def f(self):
+        return "C"
+
+
+class D(object):
+    pass
+
+
+class TestCompositions(unittest.TestCase):
+    """Aspects can first be composed, then be applied
+
+    TODO: composition with config in all permutations
+    TODO: show compose(a,b,c) == a(b(c)) == a(b)(c)
+    """
+    def test_overwrite_overwrite_plumb_plumb(self):
+        composition = aspect.compose(
+            plumb,
+            plumb,
+            overwrite2,
+            overwrite1,
+        )
+        self.assertEqual(composition(C)().f(), "plumb-plumb-overwrite2")
+        self.assertEqual(composition(C()).f(), "plumb-plumb-overwrite2")
+        self.assertEqual(composition(D)().f(), "plumb-plumb-overwrite2")
+        self.assertEqual(composition(D()).f(), "plumb-plumb-overwrite2")
+
+    def test_default_default_plumb_plumb(self):
+        composition = aspect.compose(
+            plumb,
+            plumb,
+            default2,
+            default1,
+        )
+        self.assertEqual(composition(C)().f(), "plumb-plumb-C")
+        self.assertEqual(composition(C()).f(), "plumb-plumb-C")
+        self.assertEqual(composition(D)().f(), "plumb-plumb-default1")
+        self.assertEqual(composition(D()).f(), "plumb-plumb-default1")
+
+    def test_default_overwrite_plumb_plumb(self):
+        composition = aspect.compose(
+            plumb,
+            plumb,
+            overwrite1,
+            default1,
+        )
+        self.assertEqual(composition(C)().f(), "plumb-plumb-overwrite1")
+        self.assertEqual(composition(C()).f(), "plumb-plumb-overwrite1")
+        self.assertEqual(composition(D)().f(), "plumb-plumb-overwrite1")
+        self.assertEqual(composition(D()).f(), "plumb-plumb-overwrite1")
+
+    def test_overwrite_default_plumb_plumb(self):
+        composition = aspect.compose(
+            plumb,
+            plumb,
+            default1,
+            overwrite1,
+        )
+        self.assertEqual(composition(C)().f(), "plumb-plumb-overwrite1")
+        self.assertEqual(composition(C()).f(), "plumb-plumb-overwrite1")
+        self.assertEqual(composition(D)().f(), "plumb-plumb-overwrite1")
+        self.assertEqual(composition(D()).f(), "plumb-plumb-overwrite1")
