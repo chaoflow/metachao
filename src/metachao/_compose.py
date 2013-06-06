@@ -6,8 +6,6 @@ def compose(*aspects):
     while aspects:
         aspect = aspects.pop()
 
-        class_name = "AspectComposition"
-        bases = ()
         dct = dict()
         dct.update(composition.__metachao_instructions__)
         for name, instr in aspect.__metachao_instructions__.items():
@@ -15,6 +13,8 @@ def compose(*aspects):
                 instr = instr.compose(dct[name])
             dct[name] = instr
 
-        composition = aspect.__class__(class_name, bases, dct)
+        name = "Composition"
+        bases = ()
+        composition = aspect.__class__(name, bases, dct)
 
     return composition
