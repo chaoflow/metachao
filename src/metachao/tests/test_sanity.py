@@ -4,8 +4,9 @@ import inspect
 
 from .compat import unittest
 
+
 from .. import aspect
-from ..aspect import Aspect
+
 
 class Sanity(unittest.TestCase):
     def test_isclass(self):
@@ -39,7 +40,7 @@ class Sanity(unittest.TestCase):
         class B(object):
             pass
 
-        class a(Aspect):
+        class a(aspect.Aspect):
             pass
 
         C1 = a(B)
