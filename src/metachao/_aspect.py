@@ -9,11 +9,9 @@ except ImportError:                   #pragma NO COVERAGE
 
 
 from metachao._instructions import Instruction
-from metachao._instructions import aspectkw
 from metachao._instructions import overwrite
 from metachao._instructions import plumb
 from metachao.prototype import prototype_property
-from metachao.tools import Bases, Partial, boundproperty
 from metachao import utils
 
 from ._compose import compose
@@ -63,7 +61,7 @@ class Workbench(object):
                 '__metachao_prototype__', '__new__', '__reduce__',
                 '__reduce_ex__', '__repr__', '__setattr__',
                 '__sizeof__', '__str__', '__subclasshook__',
-                )
+            )
             self.dct.update(((k, getattr(origin, k))
                              for k, v in getmembers(origin)
                              if callable(v) and not k in blacklist))
@@ -78,7 +76,7 @@ class Workbench(object):
             self.dct['__getattr__'] = lambda _, name: getattr(origin, name)
 
             # empty __init__ needed if a later aspect plumbs it
-            self.dct['__init__'] = lambda *a, **kw : None
+            self.dct['__init__'] = lambda *a, **kw: None
             self.dct['__metachao_prototype__'] = origin
 
         if '__metachao_effective__' in origin.__dict__:
