@@ -1,4 +1,3 @@
-from abc import ABCMeta
 from inspect import getmembers, getmro
 
 try:
@@ -172,7 +171,7 @@ def configured_aspect(aspect, cfg):
     return configured
 
 
-class AspectMeta(ABCMeta):
+class AspectMeta(type):
     """meta class for aspects
     """
     def __call__(aspect, origin=_UNSET, **kw):
@@ -219,7 +218,6 @@ class AspectMeta(ABCMeta):
         name = workbench.name
         workbench.dct['__metachao_aspects__'].insert(0, aspect)
         cls = workbench.type(name, workbench.baseclasses, workbench.dct)
-        #type(aspect).register(aspect, cls)
         if ZOPE_INTERFACE_AVAILABLE:
             classImplements(cls, *tuple(implementedBy(aspect)))
         if utils.isclass(origin):
