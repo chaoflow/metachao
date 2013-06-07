@@ -1,6 +1,17 @@
-from metachao._aspect import Aspect
-from metachao._instructions import default
-from metachao._instructions import aspectkw
-from metachao._instructions import cfg
-from metachao._instructions import plumb
-from metachao._compose import compose
+from __future__ import absolute_import
+
+from . import _aspect
+from . import _compose
+from . import _instructions
+
+Aspect = _aspect.Aspect
+
+config = _instructions.config
+default = _instructions.default
+plumb = _instructions.plumb
+
+compose = _compose.compose
+
+# legacy?
+cfg = _instructions.cfg
+aspectkw = _instructions.aspectkw
