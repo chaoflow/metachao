@@ -58,16 +58,16 @@ class Instruction(object):
             >>> class Foo: pass
             >>> Instruction(Foo).item is Foo
             True
-            >>> Instruction(Foo).__name__ is None
+            >>> Instruction(Foo).name is None
             True
-            >>> Instruction(Foo, name='foo').__name__ == 'foo'
+            >>> Instruction(Foo, name='foo').name == 'foo'
             True
 
             The name can be provided here for easier testing
         """
         self.item = item
         if name is not None:
-            self.__name__ = name
+            self.name = name
 
     def __repr__(self):
         return "<%s '%s' %r>" % (self.__class__.__name__,
