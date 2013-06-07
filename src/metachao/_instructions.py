@@ -189,24 +189,22 @@ class plumb(Instruction):
 
     def apply(self, workbench, effective):
         function_list = list(self.function_list)
-        if isinstance(function_list[-1], overwrite):
-            _next_method = function_list.pop().payload
+
+        instr = None
+        if isinstance(function_list[-1], (default, overwrite)):
+            instr = function_list.pop()
+            fn = instr.payload
             if not utils.isclass(workbench.origin):
-                _next_method = _next_method.__get__(
-                    workbench.origin,
-                    workbench.origin.__class__
-                )
+                fn = fn.__get__(workbench.origin, workbench.origin.__class__)
+
+        if isinstance(instr, overwrite):
+            _next_method = fn
         else:
             try:
                 _next_method = getattr(workbench.origin, self.name)
             except AttributeError:
-                if isinstance(function_list[-1], default):
-                    _next_method = function_list.pop().payload
-                    if not utils.isclass(workbench.origin):
-                        _next_method = _next_method.__get__(
-                            workbench.origin,
-                            workbench.origin.__class__
-                        )
+                if isinstance(instr, default):
+                    _next_method = fn
                 else:
                     raise
 
