@@ -33,6 +33,18 @@ class plumb(aspect.Aspect):
         return "plumb-" + _next()
 
 
+class config1(aspect.Aspect):
+    config1 = aspect.config(config1='default')
+
+
+class config2(aspect.Aspect):
+    config2 = aspect.config(config2='default')
+
+
+class config3(aspect.Aspect):
+    config3 = aspect.config(config3='default')
+
+
 class C(object):
     def f(self):
         return "C"
@@ -95,3 +107,33 @@ class TestCompositions(unittest.TestCase):
         self.assertEqual(composition(C()).f(), "plumb-plumb-overwrite1")
         self.assertEqual(composition(D)().f(), "plumb-plumb-overwrite1")
         self.assertEqual(composition(D()).f(), "plumb-plumb-overwrite1")
+
+    def test_configuration(self):
+        composition = aspect.compose(
+            config1,
+            config2(config2='preconfigured'),
+            config3(config3='preconfigured'),
+        )
+        composition = composition(
+            config3='composition',
+        )
+        self.assertEqual(composition(C)().config1, 'default')
+        self.assertEqual(composition(C()).config1, 'default')
+        self.assertEqual(composition(C)().config2, 'preconfigured')
+        self.assertEqual(composition(C()).config2, 'preconfigured')
+        self.assertEqual(composition(C)().config3, 'composition')
+        self.assertEqual(composition(C()).config3, 'composition')
+        self.assertEqual(
+            composition(C, config3='application')().config3,
+            'application'
+        )
+        self.assertEqual(
+            composition(C(), config3='application').config3,
+            'application'
+        )
+        self.assertEqual(
+            composition(C, config3='application')(
+                config3='instantiation'
+            ).config3,
+            'instantiation'
+        )
