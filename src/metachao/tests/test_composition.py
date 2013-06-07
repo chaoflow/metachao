@@ -6,11 +6,13 @@ from metachao import aspect
 
 
 class default1(aspect.Aspect):
+    @aspect.default
     def f(self):
         return "default1"
 
 
 class default2(aspect.Aspect):
+    @aspect.default
     def f(self):
         return "default2"
 
