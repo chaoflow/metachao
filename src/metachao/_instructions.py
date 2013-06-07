@@ -116,7 +116,7 @@ class default(EitherOrInstruction):
 
 
 # XXX: should probably be inheriting from overwrite
-class aspectkw(default):
+class config(default):
     """define a kw for the aspect
     """
     _key = None
@@ -135,8 +135,9 @@ class aspectkw(default):
         else:
             self.item = args[0]
 
-cfg = aspectkw
-config = cfg
+# legacy
+cfg = config
+aspectkw = cfg
 
 
 class overwrite(EitherOrInstruction):
