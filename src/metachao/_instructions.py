@@ -215,17 +215,10 @@ class plumb(Instruction):
                     raise
 
         # nest remaining functions
-        for fn in reversed(function_list):
-            if utils.isclass(workbench.origin):
-                _next_method = self._wrap_class(workbench.origin,
-                                                fn, _next_method)
-            else:
-                _next_method = self._wrap_instance(workbench.origin,
-                                                   fn, _next_method)
-                _next_method = _next_method.__get__(workbench.origin,
-                                                    workbench.origin.__class__)
-        if not utils.isclass(workbench.origin):
-            _next_method = _next_method.im_func
+        for i, fn in enumerate(reversed(function_list)):
+            _next_is_bound = (i == 0) and not utils.isclass(workbench.origin)
+            _next_method = self._wrap(workbench.origin, fn,
+                                      _next_method, _next_is_bound)
 
         # set wrapper
         workbench.dct[self.name] = _next_method
@@ -239,7 +232,7 @@ class plumb(Instruction):
         else:
             raise CantTouchThis
 
-    def _wrap_class(self, origin, fn, _next_method):
+    def _wrap(self, origin, fn, _next_method, _next_is_bound):
         attrname = self.name
 
         @wraps(fn)
@@ -248,29 +241,14 @@ class plumb(Instruction):
 
             @wraps(_next_method)
             def _next(*args, **kw):
-                return _next_method(self, *args, **kw)
+                if _next_is_bound:
+                    return _next_method(*args, **kw)
+                else:
+                    return _next_method(self, *args, **kw)
 
             # All _next methods, not just for the current name,
             # are available via _next.all
             _next.all = AllNext(origin, self)
-            return fn(_next, self, *args, **kw)
-
-        return wrapper
-
-    def _wrap_instance(self, origin, fn, _next_method):
-        attrname = self.name
-
-        @wraps(fn)
-        def wrapper(self, *args, **kw):
-            __traceback_info__ = attrname
-
-            @wraps(_next_method)
-            def _next(*args, **kw):
-                return _next_method(*args, **kw)
-
-            # All _next methods, not just for the current name,
-            # are available via _next.all
-            _next.all = AllNext(origin)
             return fn(_next, self, *args, **kw)
 
         return wrapper
