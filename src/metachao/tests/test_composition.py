@@ -45,6 +45,19 @@ class config3(aspect.Aspect):
     config3 = aspect.config(config3='default')
 
 
+class base(aspect.Aspect):
+    base = 'base'
+    child = 'base'
+
+
+class child1(base):
+    child = 'child1'
+
+
+class child2(base):
+    child = 'child2'
+
+
 class C(object):
     def f(self):
         return "C"
@@ -137,3 +150,13 @@ class TestCompositions(unittest.TestCase):
             ).config3,
             'instantiation'
         )
+
+    def test_inheritance(self):
+        composition = aspect.compose(
+            child1,
+            child2,
+        )
+        self.assertEqual(composition(C)().base, 'base')
+        self.assertEqual(composition(C)().child, 'child1')
+        self.assertEqual(composition(C()).base, 'base')
+        self.assertEqual(composition(C()).child, 'child1')
