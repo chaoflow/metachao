@@ -191,6 +191,10 @@ class plumb(Instruction):
     def apply(self, workbench, effective):
         function_list = list(self.function_list)
 
+        # If the last function is an instruction, we pop it off and
+        # later evaluate its usage versus a function retrieved from
+        # the origin. If origin is an instance, this function builds
+        # the bridge to it and therefore needs to be bound to it.
         instr = None
         if isinstance(function_list[-1], (default, overwrite)):
             instr = function_list.pop()
@@ -198,6 +202,7 @@ class plumb(Instruction):
             if not utils.isclass(workbench.origin):
                 fn = fn.__get__(workbench.origin, workbench.origin.__class__)
 
+        # overwrite wins over origin, default loses
         if isinstance(instr, overwrite):
             _next_method = fn
         else:
@@ -209,6 +214,7 @@ class plumb(Instruction):
                 else:
                     raise
 
+        # nest remaining functions
         for fn in reversed(function_list):
             if utils.isclass(workbench.origin):
                 _next_method = self._wrap_class(workbench.origin,

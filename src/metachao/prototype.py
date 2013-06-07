@@ -31,7 +31,7 @@ def prototyper(prototype, bind=dict()):
                 '__dict__',
                 '__metachao_bind__',
                 '__metachao_prototype__',
-                ):
+            ):
                 return object.__getattribute__(self, name)
 
             # no binding, if served from instance dictionary
@@ -40,7 +40,7 @@ def prototyper(prototype, bind=dict()):
                 return selfdict[name]
 
             # check class' members for properties
-            attr = dict((k,v) for k,v in getmembers(self.__class__)
+            attr = dict((k, v) for k, v in getmembers(self.__class__)
                         if k == name and isinstance(v, property)
                         ).get(name, ())
 
@@ -63,7 +63,6 @@ def prototyper(prototype, bind=dict()):
             return attr
 
     return Prototyper
-
 
 
 # XXX: I don't think this will be needed anymore
