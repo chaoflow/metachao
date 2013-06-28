@@ -259,6 +259,9 @@ class child(object):
     def instructions(cls, aspect, children):
         instructions = dict()
 
+        if not children:
+            return instructions
+
         @plumb
         def __getitem__(_next, self, key):
             try:
