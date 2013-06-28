@@ -15,6 +15,7 @@ from metachao.prototype import prototype_property
 from metachao import utils
 
 from ._compose import compose
+from ._instructions import child as child_instruction
 from ._instructions import config as config_instruction
 
 
@@ -92,6 +93,7 @@ def parse_aspect(aspect):
     config = dict()
     instructions = dict()
     seen = list()
+    children = dict()
 
     # walk the mro, w/o object, gathering/creating instructions
     # XXX: not sure whether that is good
@@ -116,6 +118,11 @@ def parse_aspect(aspect):
             if name in seen:
                 continue
             seen.append(name)
+
+            if isinstance(item, child_instruction):
+                key = getattr(item, 'key', name)
+                children[key] = item
+                continue
 
             # undecorated items are understood as overwrite
             if isinstance(item, Instruction):
@@ -146,6 +153,9 @@ def parse_aspect(aspect):
         __init__.name = '__init__'
         __init__.parent = aspect
         instructions['__init__'] = __init__
+
+    if children:
+        instructions.update(child_instruction.instructions(aspect, children))
 
     return (config, instructions)
 

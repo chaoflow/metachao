@@ -6,6 +6,7 @@ from . import _instructions
 
 Aspect = _aspect.Aspect
 
+child = _instructions.child
 config = _instructions.config
 default = _instructions.default
 plumb = _instructions.plumb

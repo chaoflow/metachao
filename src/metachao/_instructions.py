@@ -252,3 +252,84 @@ class plumb(Instruction):
             return fn(_next, self, *args, **kw)
 
         return wrapper
+
+
+class child(object):
+    @classmethod
+    def instructions(cls, aspect, children):
+        instructions = dict()
+
+        @plumb
+        def __getitem__(_next, self, key):
+            try:
+                child = children[key]
+                getter = child._fns['getter'].__get__(self, self.__class__)
+            except (AttributeError, KeyError):
+                getter = _next
+            return getter(key)
+
+        __getitem__.name = '__getitem__'
+        __getitem__.parent = aspect
+        instructions['__getitem__'] = __getitem__
+
+        @plumb
+        def __setitem__(_next, self, key, value):
+            try:
+                child = children[key]
+                setter = child._fns['setter'].__get__(self, self.__class__)
+            except (AttributeError, KeyError):
+                setter = _next
+            return setter(key, value)
+
+        __setitem__.name = '__setitem__'
+        __setitem__.parent = aspect
+        instructions['__setitem__'] = __setitem__
+
+        @plumb
+        def __delitem__(_next, self, key):
+            try:
+                child = children[key]
+                deleter = child._fns['deleter'].__get__(self, self.__class__)
+            except (AttributeError, KeyError):
+                deleter = _next
+            return deleter(key)
+
+        __delitem__.name = '__delitem__'
+        __delitem__.parent = aspect
+        instructions['__delitem__'] = __delitem__
+
+        return instructions
+
+    def __init__(self, getter=None, setter=None, deleter=None, key=None):
+        self._fns = dict()
+        if getter is not None:
+            self._fns['getter'] = getter
+        if setter is not None:
+            self._fns['setter'] = setter
+        if deleter is not None:
+            self._fns['deleter'] = deleter
+        if key is not None:
+            self.key = key
+
+    def __call__(self, getter=None, setter=None, deleter=None, key=None):
+        if getter is not None:
+            self._fns['getter'] = getter
+        if setter is not None:
+            self._fns['setter'] = setter
+        if deleter is not None:
+            self._fns['deleter'] = deleter
+        if key is not None:
+            self.key = key
+        return self
+
+    def getter(self, getter):
+        self._fns['getter'] = getter
+        return self
+
+    def setter(self, setter):
+        self._fns['setter'] = setter
+        return self
+
+    def deleter(self, deleter):
+        self._fns['deleter'] = deleter
+        return self
