@@ -191,10 +191,11 @@ class plumb(Instruction):
     def apply(self, workbench, effective):
         function_list = list(self.function_list)
 
-        # If the last function is an instruction, we pop it off and
-        # later evaluate its usage versus a function retrieved from
-        # the origin. If origin is an instance, this function builds
-        # the bridge to it and therefore needs to be bound to it.
+        # If the last function is a default or overwrite instruction,
+        # we pop it off and later evaluate its usage versus a function
+        # retrieved from the origin. If origin is an instance, this
+        # function builds the bridge to it and therefore needs to be
+        # bound to it.
         instr = None
         if isinstance(function_list[-1], (default, overwrite)):
             instr = function_list.pop()
@@ -264,6 +265,8 @@ class child(object):
 
         @plumb
         def __getitem__(_next, self, key):
+            """Consult getter for known child or call _next
+            """
             try:
                 child = children[key]
                 getter = child._fns['getter'].__get__(self, self.__class__)
@@ -277,6 +280,8 @@ class child(object):
 
         @plumb
         def __setitem__(_next, self, key, value):
+            """Consult setter for known child or call _next
+            """
             try:
                 child = children[key]
                 setter = child._fns['setter'].__get__(self, self.__class__)
@@ -290,6 +295,8 @@ class child(object):
 
         @plumb
         def __delitem__(_next, self, key):
+            """Consult deleter for known child or call _next
+            """
             try:
                 child = children[key]
                 deleter = child._fns['deleter'].__get__(self, self.__class__)
