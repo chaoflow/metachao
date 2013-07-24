@@ -137,6 +137,13 @@ def parse_aspect(aspect):
             if isinstance(instruction, config_instruction):
                 config[instruction.key] = instruction
 
+    if children:
+        for name, instr in child_instruction.instructions(
+                aspect, children).items():
+            if name in instructions:
+                instr = instr.compose(instructions[name])
+            instructions[name] = instr
+
     aspectkws = config
     if aspectkws:
         @plumb
@@ -152,10 +159,9 @@ def parse_aspect(aspect):
 
         __init__.name = '__init__'
         __init__.parent = aspect
+        if '__init__' in instructions:
+            __init__ = __init__.compose(instructions['__init__'])
         instructions['__init__'] = __init__
-
-    if children:
-        instructions.update(child_instruction.instructions(aspect, children))
 
     return (config, instructions)
 

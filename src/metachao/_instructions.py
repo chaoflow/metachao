@@ -227,11 +227,13 @@ class plumb(Instruction):
 
     def compose(self, other):
         if isinstance(other, plumb):
-            return plumb(self.function_list + other.function_list)
+            instr = plumb(self.function_list + other.function_list)
         elif isinstance(other, (default, overwrite)):
-            return plumb(self.function_list + (other,))
+            instr = plumb(self.function_list + (other,))
         else:
             raise CantTouchThis
+        instr.name = self.name
+        return instr
 
     def _wrap(self, origin, fn, _next_method, _next_is_bound):
         attrname = self.name
