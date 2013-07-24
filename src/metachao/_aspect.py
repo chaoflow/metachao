@@ -47,6 +47,7 @@ class Workbench(object):
             # is not what you want, consider subclassing first.
             # XXX: it totally should indicate that sth is different
             #self.dct['__module__'] = origin.__module__
+            self.dct['__doc__'] = origin.__doc__
         else:
             # we are pretty much creating an object that uses origin
             # as prototype.
@@ -79,6 +80,8 @@ class Workbench(object):
             # empty __init__ needed if a later aspect plumbs it
             self.dct['__init__'] = lambda *a, **kw: None
             self.dct['__metachao_prototype__'] = origin
+
+            self.dct['__doc__'] = origin.__doc__
 
         if '__metachao_effective__' in origin.__dict__:
             self.dct['__metachao_effective__'] = \
