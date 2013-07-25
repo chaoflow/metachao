@@ -252,6 +252,7 @@ class plumb(Instruction):
             # All _next methods, not just for the current name,
             # are available via _next.all
             _next.all = AllNext(origin, self)
+            _next._next_method = _next_method
             return fn(_next, self, *args, **kw)
 
         return wrapper
