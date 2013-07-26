@@ -135,10 +135,6 @@ class config(default):
         else:
             self.item = args[0]
 
-# legacy
-cfg = config
-aspectkw = cfg
-
 
 class overwrite(EitherOrInstruction):
     """Internal instruction for undecorated attributes

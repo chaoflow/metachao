@@ -14,5 +14,5 @@ plumb = _instructions.plumb
 compose = _compose.compose
 
 # legacy?
-cfg = _instructions.cfg
-aspectkw = _instructions.aspectkw
+cfg = config
+aspectkw = config
