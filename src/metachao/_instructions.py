@@ -1,7 +1,7 @@
 import logging
 import utils
 
-from inspect import getmembers
+from .utils import getmembers
 
 #logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('metachao')

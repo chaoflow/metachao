@@ -1,4 +1,4 @@
-from inspect import getmembers, getmro
+from inspect import getmro
 
 try:
     from zope.interface import classImplements
@@ -17,6 +17,7 @@ from metachao import utils
 from ._compose import compose
 from ._instructions import child as child_instruction
 from ._instructions import config as config_instruction
+from .utils import getmembers
 
 
 DICT_KEYS_OF_PLAIN_CLASS = ['__dict__', '__doc__', '__module__', '__weakref__']

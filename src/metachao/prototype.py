@@ -1,4 +1,4 @@
-from inspect import getmembers
+from .utils import getmembers
 
 
 def derive(prototype, bind=dict()):
