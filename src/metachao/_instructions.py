@@ -2,9 +2,6 @@ import logging
 import utils
 
 from inspect import getmembers
-from inspect import getmro
-
-from metachao.tools import partial
 
 #logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger('metachao')
