@@ -27,4 +27,4 @@ def isclass(obj):
 
     If a getattr is broken, the latter test falsly returns True.
     """
-    return type(obj) in (types.ClassType, type)
+    return type(obj) in (types.ClassType, type) or issubclass(type(obj), type)
