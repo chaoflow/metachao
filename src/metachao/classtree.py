@@ -72,7 +72,12 @@ class instantiate_upon_traversal(aspect.Aspect):
         return node
 
 
-class Node(object):
+class Base(object):
     """Base class for class-based trees
     """
     __metaclass__ = node
+
+
+@instantiate_upon_traversal
+class Node(Base, OrderedDict):
+    pass

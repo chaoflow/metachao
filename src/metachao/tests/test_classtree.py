@@ -8,7 +8,7 @@ from metachao.classtree import OrderedDict
 
 class TestClassnode(unittest.TestCase):
     def setUp(self):
-        class Base(classtree.Node):
+        class Base(classtree.Base):
             pass
 
         class A(Base):
@@ -53,9 +53,8 @@ class TestClassnode(unittest.TestCase):
 
 class TestInstantiation(unittest.TestCase):
     def setUp(self):
-        @classtree.instantiate_upon_traversal
-        class Base(OrderedDict):
-            __metaclass__ = classtree.node
+        class Base(classtree.Node):
+            pass
 
         class Root(Base):
             pass
