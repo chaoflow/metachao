@@ -2,14 +2,13 @@ from __future__ import absolute_import
 
 from .compat import unittest
 
-from metachao.classnode import classnode
-from metachao.classnode import ClassNode
-from metachao.classnode import OrderedDict
+from metachao import classtree
+from metachao.classtree import OrderedDict
 
 
 class TestClassnode(unittest.TestCase):
     def setUp(self):
-        class Base(ClassNode):
+        class Base(classtree.Node):
             pass
 
         class A(Base):
@@ -18,13 +17,9 @@ class TestClassnode(unittest.TestCase):
         class B(Base):
             pass
 
-        class Node(OrderedDict):
-            __metaclass__ = classnode
-
         self.Base = Base
         self.A = A
         self.B = B
-        self.Node = Node
 
     def test_setgetitem(self):
         self.Base['a'] = self.A
