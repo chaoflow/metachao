@@ -31,4 +31,4 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(utils.isclass(meta))
 
     def test_isclass_aspect(self):
-        self.assertFalse(utils.isclass(Aspect))
+        self.assertTrue(utils.isclass(Aspect))
