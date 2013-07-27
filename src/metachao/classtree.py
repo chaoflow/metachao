@@ -3,18 +3,23 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
+from metachao import aspect
+
 
 CLASSTREE_ATTR = '__metachao_classtree__'
 
 
 def tree(cls):
+    """Get the class tree of a class
+    """
     return getattr(cls, CLASSTREE_ATTR)
 
 
 class node(type):
-    """Class node
+    """Generate classtree node's
 
-    Using this metaclass you can build trees consisting of classes.
+    A class tree consists of classes (in contrast to instances) that
+    can store children via dictionary API.
 
     """
     def __init__(cls, name, bases, dct):
@@ -52,5 +57,22 @@ class node(type):
         return tree(cls).items()
 
 
+class instantiate_upon_traversal(aspect.Aspect):
+    """Instantiate class trees of dictionary-like nodes upon traversal"""
+
+    @aspect.plumb
+    def __getitem__(_next, self, key):
+        try:
+            return _next(key)
+        except KeyError:
+            pass
+
+        node = self.__class__[key]()
+        self[key] = node
+        return node
+
+
 class Node(object):
+    """Base class for class-based trees
+    """
     __metaclass__ = node
