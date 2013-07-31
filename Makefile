@@ -36,10 +36,10 @@ var-clean:
 	rm -fR var/*
 
 check: var var-clean
-	${NOSETESTS} -v -w . --processes=4 ${ARGS}
+	${NOSETESTS} -v -w . --processes=4 ${ARGS} --with-doctest --doctest-extension=rst
 
 check-debug: var var-clean
-	DEBUG=1 ${NOSETESTS} -v -w . --ipdb --ipdb-failures ${ARGS}
+	DEBUG=1 ${NOSETESTS} -v -w . --ipdb --ipdb-failures ${ARGS} --with-doctest --doctest-extension=rst
 
 coverage: var var-clean
 	rm -f .coverage
