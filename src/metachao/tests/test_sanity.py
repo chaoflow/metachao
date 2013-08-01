@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import inspect
+import sys
 
 from .compat import unittest
 
@@ -24,13 +25,15 @@ class Sanity(unittest.TestCase):
 
         self.assertTrue(inspect.isclass(A))
         # ATTENTION: inspect.isclass fails if __getattr__ is broken
-        self.assertTrue(inspect.isclass(A()))
+        # for python <2.7
+        if sys.version_info < (2, 7):
+            self.assertTrue(inspect.isclass(A()))
+        else:
+            self.assertFalse(inspect.isclass(A()))
 
     def test_isclass_with_getattr(self):
         class A(object):
             def __getattr__(self, name):
-                """A getattr that does not raise AttributeError, ever.
-                """
                 raise AttributeError
 
         self.assertTrue(inspect.isclass(A))
