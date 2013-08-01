@@ -16,6 +16,6 @@ buildEnv {
   name = "dev-env";
   ignoreCollisions = true;
   paths =
-    [
+    [ pythonPackages.zope_interface
     ] ++ base.paths;
 }
