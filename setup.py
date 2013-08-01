@@ -30,8 +30,6 @@ setup(name='metachao',
           ],
       extras_require={
           'test': [
-              'nose',
-              'coverage',
               'zope.interface',
               ],
           },
