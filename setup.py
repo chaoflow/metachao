@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.7'
+version = '0.8.dev0'
 shortdesc = ""
 longdesc = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 
