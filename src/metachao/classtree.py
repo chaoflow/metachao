@@ -82,7 +82,6 @@ class Base(object):
 class Node(Base, OrderedDict):
     pass
 
-
 class instantiate(aspect.Aspect):
     """Self-instantiating class trees of dictionary-like nodes
 
@@ -109,9 +108,7 @@ either
 2. a new instance if a class has been provided with the classtree
 3. the result of __getitem__ on the original class
 
-instead of just a classname, the classtree can also hold a tuple,
-where the first item is a class name and the rest are attributes of
-the instance, which are used as parameters for creating the instance.
+Instances are given their parent instance as keyword argument parent.
         """
 
         try:
@@ -121,13 +118,7 @@ the instance, which are used as parameters for creating the instance.
 
         try:
             cls = self.__class__[key]
-            if isinstance(cls, tuple):
-                params = (getattr(self, p) for p in cls[1:])
-                cls = cls[0]
-            else:
-                params = ()
-
-            node = cls(*params)
+            node = cls(parent=self)
             getattr(self, CLASSTREE_ATTR)[key] = node
             return node
         except KeyError:
