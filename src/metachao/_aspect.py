@@ -84,7 +84,7 @@ class Workbench(object):
 
             self.dct['__doc__'] = origin.__doc__
 
-        if '__metachao_effective__' in origin.__dict__:
+        if '__metachao_effective__' in getattr(origin, '__dict__', ()):
             self.dct['__metachao_effective__'] = \
                 origin.__metachao_effective__.copy()
 
