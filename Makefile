@@ -2,7 +2,7 @@ LOCALISED_SCRIPTS = ipython ipdb flake8 pylint nose
 PROJECT = $(shell basename $(shell pwd))
 
 PYTHON_VERSION = 2.7
-NIX_PROFILE = ./nixprofile${PYTHON_VERSION}
+NIX_PROFILE = ${NIX_USER_PROFILE_DIR}/nixprofile-${PROJECT}-py${PYTHON_VERSION}
 NIX_SITE = ${NIX_PROFILE}/lib/python${PYTHON_VERSION}/site-packages
 VENV_CMD = ${NIX_PROFILE}/bin/virtualenv
 VENV = .
@@ -14,6 +14,7 @@ all: print-python-version test-import check
 
 bootstrap:
 	nix-env -p ${NIX_PROFILE} -i dev-env -f dev${PYTHON_VERSION}.nix
+	rm -f nixprofile && ln -sf ${NIX_PROFILE} nixprofile
 	${VENV_CMD} --distribute --clear .
 	realpath --no-symlinks --relative-to ${VENV_SITE} ${NIX_SITE} > ${VENV_SITE}/nixprofile.pth
 	${VENV}/bin/pip install -r requirements.txt --no-index -f ""
