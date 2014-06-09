@@ -160,3 +160,11 @@ class TestCompositions(unittest.TestCase):
         self.assertEqual(composition(C)().child, 'child1')
         self.assertEqual(composition(C()).base, 'base')
         self.assertEqual(composition(C()).child, 'child1')
+
+    def test_aspect_on_aspect_with_kw(self):
+        composition = config1(config2)
+        self.assertEqual(composition(C)().config1, 'default')
+        self.assertEqual(composition(C)().config2, 'default')
+        composition = config1(config2, config1='1')
+        self.assertEqual(composition(C)().config1, '1')
+        self.assertEqual(composition(C)().config2, 'default')

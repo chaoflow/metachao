@@ -212,9 +212,6 @@ class AspectMeta(type):
 
         # if called with another aspect compose them
         if type(origin) is AspectMeta:
-            if kw:
-                # XXX: looks we could soon do this
-                raise Unsupported("kw and composition not supported")
             return compose(aspect, origin)
 
         # a single aspects called on a normal class or an instance
@@ -222,15 +219,9 @@ class AspectMeta(type):
         for instruction in aspect.__metachao_instructions__.values():
             instruction(workbench)
 
-            #raise AspectCollision(instr.name, aspect, target)
-
-            # in case of instances functions need to be bound
-            # if not x_is_class and (type(instr) is types.FunctionType):
-            #     instr = instr.__get__(x)
-
         # build a new class, with the same name and bases as the
         # target class, but a new dictionary with the aspect applied.
-        # XXX: name is lenght limited... hackup traceback or something
+        # XXX: name is length limited... hackup traceback or something
         # to generate more useful info
         #name = '%s:%s' % (aspect.__name__, workbench.name)
         name = workbench.name
