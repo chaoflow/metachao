@@ -35,10 +35,26 @@ class children_ab(aspect.Aspect):
 
     b = aspect.child(_getitem_b, _setitem_b, _delitem_b)
 
+    getonly = aspect.child(lambda self, key: None)
+    setonly = aspect.child(None, lambda self, key, value: None)
+    delonly = aspect.child(None, None, lambda self, key: None)
+
 
 @children_ab
 class C(dict):
     pass
+
+
+def getit(c):
+    return c['getonly']
+
+
+def setit(c):
+    c['getonly'] = 1
+
+
+def delit(c):
+    del c['delonly']
 
 
 class TestChild(unittest.TestCase):
@@ -71,3 +87,21 @@ class TestChild(unittest.TestCase):
         self.assertFalse(hasattr(c, '@a'))
         self.assertFalse(hasattr(c, 'b'))
         self.assertFalse(dict.__contains__(c, 'x'))
+
+    def test_getonly(self):
+        c = C()
+        self.assertIsNone(getit(c))
+        self.assertRaises(KeyError, setit(c))
+        self.assertRaises(KeyError, delit(c))
+
+    def test_setonly(self):
+        c = C()
+        self.assertRaises(KeyError, getit(c))
+        self.assertIsNone(setit(c))
+        self.assertRaises(KeyError, delit(c))
+
+    def test_delonly(self):
+        c = C()
+        self.assertRaises(KeyError, getit(c))
+        self.assertRaises(KeyError, setit(c))
+        self.assertIsNone(delit(c))
